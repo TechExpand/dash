@@ -7,6 +7,7 @@ const User = require('../models/user');
 let multer = require("multer");
 const fs = require("fs");
 const bcrypt = require("bcrypt");
+const Verify = require('../models/verify');
 const router = express.Router();
 const TOKEN_SECRET = "222hwhdhnnjduru838272@@$henncndbdhsjj333n33brnfn";
 
