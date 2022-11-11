@@ -1,16 +1,18 @@
 const express = require('express');
 const axios = require("axios");
-
+var jwt = require("jsonwebtoken");
 const cloudinary = require("cloudinary").v2;
 const model = require('../models');
 const User = require('../models/user');
 let multer = require("multer");
 const fs = require("fs");
+const bcrypt = require("bcrypt");
 const router = express.Router();
-
+const TOKEN_SECRET = "222hwhdhnnjduru838272@@$henncndbdhsjj333n33brnfn";
 
 module.exports = router;
 
+const saltRounds = 10;
 
 
 
@@ -31,59 +33,55 @@ const validateEmail = (email) => {
 
 
 router.post("/signup",  (req, res, next)=> {
-    let {phone, email, firstname, lastname, accountType, joined } = req.body;
-    if (!phone || !accountType || !joined) {
+    let {phone, email, password, surname, accountType, joined } = req.body;
+    if (!phone || !email || !password || !accountType || !joined) {
       res.status(400).send({ message: "field cannot be empty" });
-    }
+    }else if (!validateEmail(email)) {
+        res.status(400).send({ message: "enter a valid email" });
+      }
   else{
       User.findOne({ phone: phone })
       .then(function (phoneuser) {
-           if (phoneuser) {
-            res.status(400).send({ message: "phone already exist" });
-          } 
-        else {
-          console.log(phone)
-          User.create({
-            email: email,
-     
-            phone: phone,
-            firstname: firstname,
-            lastname: lastname,
-            image: "",
-       
-            status: "completed",
-            accountType: accountType,
-            joined: joined,
-          })
-          .then(function (createduser) {
-              let token = jwt.sign({ id: createduser._id }, TOKEN_SECRET, {
-                expiresIn: "3600000000s",
-              });
-             
-         Wallet.create({
-          amount: "0",
-          intransit: "0",
-          user: createduser._doc._id,
-          walletid: "",
-         }).then(function(wallet){
-          res.send({
-            id: createduser._doc._id,
-            token: token,
-            email: email,
-         
-            phone: phone,
-            firstname: firstname,
-            lastname: lastname,
-            image: "",
-            accountType: accountType,
-            status: "completed",
-            joined: joined,
-          });
-         })
-
-            })
-            .catch(next);
+        if(!phoneuser) {
+            bcrypt.hash(password, saltRounds, function (err, hashedPassword) {
+                User.create({
+                    email: email,
+                    phone: phone,
+                    surname: surname,
+                    image: "",
+                    password: hashedPassword,
+                    status: "active",
+                    accountType: accountType,
+                    joined: joined,
+                  })
+                  .then(function (createduser) {
+                      let token = jwt.sign({ id: createduser._id }, TOKEN_SECRET, {
+                        expiresIn: "3600000000s",
+                      });
+                     
+                      res.send({
+                        id: createduser._doc._id,
+                        token: token,
+                        email: email,
+                        password: hashedPassword,
+                        phone: phone,
+                        surname: surname,
+                        image: "",
+                        accountType: accountType,
+                        status: "active",
+                        joined: joined,
+                      });
+        
+                    })
+                    .catch(next);
+            });
         }
+           else if (phoneuser.phone == phone) {
+            res.status(400).send({ message: "phone already exist"});
+          } else if (phoneuser.emai == email) {
+            res.status(400).send({ message: "email already exist"});
+          } 
+       
       })
     .catch(next);
   }
@@ -92,9 +90,9 @@ router.post("/signup",  (req, res, next)=> {
 
 
 
-  router.post("/userlogin",  (req, res, next)=> {
-    let { phone} = req.body;
-    if (!phone || phone ==="") {
+  router.post("/login",  (req, res, next)=> {
+    let { phone, password} = req.body;
+    if (!phone || phone ==="" || !password || password=="") {
       res.status(400).send({ message: "field cannot be empty" });
     }
 else{
@@ -105,58 +103,29 @@ User.findOne({ phone: phone })
   }
 
   else{
-
-      let token = jwt.sign({ id: user._id }, TOKEN_SECRET, {
-        expiresIn: "3600000000s",
-      });
-
-       if(user.accountType == "users"){
-        res.send({
-          user: user._id,
-            token: token,
-            email: user.email,
-            phone: user.phone,
-            firstname: user.firstname,
-            lastname: user.lastname,
-            image: user.image,
-            accountType: user.accountType,
-            status: user.status,
-        });
-       }else if(user.accountType == "vendor"){
-         
-          if(user=="completed"){
-            Store.findOne({user: user._id}).then(function(store){
-              res.send({
-                user: user._id,
-                token: token,
-                email: user.email,
-                phone: user.phone,
-                firstname: user.firstname,
-                lastname: user.lastname,
-                image: user.image,
-                accountType: user.accountType,
-                status: user.status,
-                storeid: store._id,
-                ...store
-            } );
-             })
-          }else{
-              res.send({
-                user: user._id,
-                token: token,
-                email: user.email,
-                phone: user.phone,
-                firstname: user.firstname,
-                lastname: user.lastname,
-                image: user.image,
-                accountType: user.accountType,
-                status: user.status,
-            } );
+    bcrypt.compare(password, user.password).then(function (result) {
+        if (!result) {
+            res.status(400).send({message: "invalid credentials"})
           
-          }
-          
-       }
+        }
+        else {
+            let token = jwt.sign({ id: user._id }, TOKEN_SECRET, {
+                expiresIn: "3600000000s",
+            });
+            res.send({
+                  user: user._id,
+                  token: token,
+                  email: user.email,
+                  phone: user.phone,
+    
+                  surname: user.surname,
+                  image: user.image,
+                  accountType: user.accountType,
+                  status: user.status,
+              });
 
+        }
+    });
   }
 })
 .catch(next);
@@ -256,3 +225,26 @@ User.findOne({ phone: phone })
   });
 
 
+
+
+
+  router.post("/reset", async (req, res, next) => {
+
+    User.findOne({ phone: req.body.phone })
+      .then(function (user) {
+        if (!user) {
+          res.status(400).send({ message: "user does not exist" });
+        }
+  
+        let newPassword = req.body.password;
+  
+        bcrypt.hash(newPassword, saltRounds, function (err, hashedPassword) {
+          User.updateOne({ phone: req.body.phone }, { password: hashedPassword })
+            .then(function (update) {
+              res.send({message: "updated"})
+            })
+            .catch(next);
+        });
+      })
+      .catch(next);
+  });

@@ -18,13 +18,9 @@ const UserSchema = new Schema({
         required: [true, 'password field is required']
     },
 
-    firstname: {
+    surname: {
         type: String,
-        // required: [true, 'firstname field is required']
-    },
-    lastname: {
-        type: String,
-        // required: [true, 'lastname field is required']
+        // required: [true, 'surname field is required']
     },
 	image: String,
 	accountType: {

@@ -26,7 +26,7 @@ app.use(express.urlencoded({extended: true}));;
 
 
 const mongoose = require('mongoose');
-const uri = "mongodb+srv://matline126:matline126@cluster0.9ymqqhu.mongodb.net/matline?retryWrites=true&w=majority";
+const uri = "mongodb+srv://ediku126:ediku126@cluster0.wowunro.mongodb.net/?retryWrites=true&w=majority";
 // const uri = "mongodb://localhost:27017/matline"
 mongoose.connect(uri, {
     useNewUrlParser: true,
