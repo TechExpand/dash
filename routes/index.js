@@ -8,6 +8,8 @@ let multer = require("multer");
 const fs = require("fs");
 const bcrypt = require("bcrypt");
 const Verify = require('../models/verify');
+const Shipment = require('../models/profile');
+const Profile = require('../models/profile');
 const router = express.Router();
 const TOKEN_SECRET = "222hwhdhnnjduru838272@@$henncndbdhsjj333n33brnfn";
 
@@ -72,6 +74,49 @@ router.post("/signup",  (req, res, next)=> {
                       let token = jwt.sign({ id: createduser._id }, TOKEN_SECRET, {
                         expiresIn: "3600000000s",
                       });
+
+                      if(accountType != "user"){
+                        Profile.create({
+                          shipType: req.body.shipType,
+                          todayEarn: 0,
+                          rate: 0,
+                          status: true,
+                          verified: false,
+                          user:  mongoose.Types.ObjectId(createduser._doc._id),
+                        })
+                        .then(async (shipment) => {
+                          res.send({
+                            id: createduser._doc._id,
+                            token: token,
+                            email: email,
+                            shipType: req.body.shipType,
+                            password: hashedPassword,
+                            phone: phone,
+                            surname: surname,
+                            todayEarn: 0,
+                            rate: 0,
+                            status: true,
+                            verified: false,
+                            image: "",
+                            accountType: accountType,
+                            status: "active",
+                            joined: joined,
+                          });
+                        })
+                      }else{
+                        res.send({
+                          id: createduser._doc._id,
+                          token: token,
+                          email: email,
+                          password: hashedPassword,
+                          phone: phone,
+                          surname: surname,
+                          image: "",
+                          accountType: accountType,
+                          status: "active",
+                          joined: joined,
+                        });
+                      }
                      
                       res.send({
                         id: createduser._doc._id,
@@ -101,6 +146,12 @@ router.post("/signup",  (req, res, next)=> {
   }
     
   });
+
+
+
+
+
+
 
 
 
@@ -189,6 +240,8 @@ User.findOne({ phone: phone })
       })
       .catch(next);
   })
+
+
   
   
   router.post("/verifyotp/:serviceID/:code", async (req, res, next) => {
