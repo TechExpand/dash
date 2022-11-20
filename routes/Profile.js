@@ -23,6 +23,7 @@ const { getMessaging } = require('firebase-admin/messaging');
 
 var serviceAccount = require("../keys/key.json");
 const Profile = require('../models/profile');
+const Location = require('../models/location');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
@@ -261,6 +262,44 @@ router.put("/token", (req, res, next)=>{
         {_id:  mongoose.Types.ObjectId(value._id) },
         {
           token: req.body.token,
+        },
+        function(err, docs){
+          if (err) {
+            res.status(400).send({ message: "failed" });
+          }else{
+            res.status(200).send({ message: "updated" });
+          }
+        }
+      )
+     })
+    }
+ })
+
+  })
+
+
+
+
+  router.put("/location", (req, res, next)=>{
+
+ Location.find({user: mongoose.Types.ObjectId(req.body.id)}).then(function(value){
+    if(value.length == 0){
+        Location.create(
+        {
+          user: req.body.id,
+          lan: req.body.lan,
+          long: req.body.long,
+        }
+      ).then(function(value){
+        res.status(200).send({ message: "created" });
+      })
+    }else{
+        Location.findOne({user: mongoose.Types.ObjectId(req.body.id)}).then(function(value){
+        Location.findByIdAndUpdate(
+        {_id:  mongoose.Types.ObjectId(value._id) },
+        {
+            lan: req.body.lan,
+            long: req.body.long,
         },
         function(err, docs){
           if (err) {
