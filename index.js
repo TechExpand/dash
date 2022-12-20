@@ -38,8 +38,11 @@ mongoose.connect(uri, {
   .catch(err => console.log(err))
 
 
-app.use('/', routes);
-
+  app.use('/',  require('./routes/index'));
+  app.use('/',  require('./routes/shipment'));
+  app.use('/',  require('./routes/Verification'));
+  app.use('/',  require('./routes/review'));
+  app.use('/',  require('./routes/Profile'));
 
 app.use(function(err,req,res,next){
 	res.status(422).send({error: err.message});
