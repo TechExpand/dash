@@ -18,17 +18,21 @@ const Verify = require('../models/verify');
 // const Pin = require('../models/pin');
 const Token = require('../models/token');
 
-// var admin = require("firebase-admin");
-// const { getMessaging } = require('firebase-admin/messaging');
 
-// var serviceAccount = require("../keys/key.json");
+
+
 const Profile = require('../models/profile');
 const Location = require('../models/location');
 
-// admin.initializeApp({
-//   credential: admin.credential.cert(serviceAccount)
-// });
 
+var admin = require("firebase-admin");
+const { getMessaging } = require('firebase-admin/messaging');
+
+var serviceAccount = require("../keys/key.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
 
 
 
@@ -290,7 +294,7 @@ router.put("/token", (req, res, next)=>{
     if(value.length == 0){
         Location.create(
         {
-          user: req.body.id,
+          user: mongoose.Types.ObjectId(req.body.id),
           lan: req.body.lan,
           long: req.body.long,
         }
