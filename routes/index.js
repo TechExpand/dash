@@ -224,7 +224,7 @@ User.findOne({ phone: phone })
       .then(async (banks) => {
         // `https://account.kudisms.net/api/?username=anthony@martlines.ng&password=sirador@101&message=${code} is your verification code for Martline&sender=Martline&mobiles=${req.params.phone}`
   
-        const response = await axios.post(`https://account.kudisms.net/api/?username=anthony@martlines.ng&password=sirador@101&message=${code} is your Dash access. Do not share this with anyone.&sender=Martline&mobiles=${req.params.phone}`);
+        const response = await axios.post(`https://account.kudisms.net/api/?username=anthony@martlines.ng&password=sirador@101&message=${code} is your Dash verification-code. Do not share this with anyone.&sender=Martline&mobiles=${req.params.phone}`);
   
         if (response.status <= 300) {
           res.send({
