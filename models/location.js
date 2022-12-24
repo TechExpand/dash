@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 
 const LocationScema = new Schema({
     lan: String,
-    long: Sting,
+    long: String,
     user: { type: Schema.Types.ObjectId, ref: 'user' },
   });
   

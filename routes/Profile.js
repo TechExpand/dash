@@ -1,7 +1,7 @@
 const express = require('express');
 const User = require('../models/user');
-const Store = require('../models/store');
-const Wallet = require('../models/wallet');
+// const Store = require('../models/store');
+// const Wallet = require('../models/wallet');
 const validate = require('../middleware/validate');
 const router = express.Router();
 const { json } = require("body-parser");
@@ -12,22 +12,22 @@ const axios = require("axios");
 const cloudinary = require("cloudinary").v2;
 let multer = require("multer");
 const fs = require("fs");
-const Transaction = require('../models/transaction');
-const InvoiceProduct = require('../models/invoiceProducts');
+// const Transaction = require('../models/transaction');
+// const InvoiceProduct = require('../models/invoiceProducts');
 const Verify = require('../models/verify');
-const Pin = require('../models/pin');
+// const Pin = require('../models/pin');
 const Token = require('../models/token');
 
-var admin = require("firebase-admin");
-const { getMessaging } = require('firebase-admin/messaging');
+// var admin = require("firebase-admin");
+// const { getMessaging } = require('firebase-admin/messaging');
 
-var serviceAccount = require("../keys/key.json");
+// var serviceAccount = require("../keys/key.json");
 const Profile = require('../models/profile');
 const Location = require('../models/location');
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount)
+// });
 
 
 
@@ -194,12 +194,13 @@ router.get("/getuserprofile/:id", (req, res, next) => {
 router.get("/getriderprofile/:id", (req, res, next) => {
     User.findOne({ _id: mongoose.Types.ObjectId(req.params.id) }).then(function (user) {
         Profile.findOne({ user: mongoose.Types.ObjectId(req.params.id) }).then(function (profile) {
-            res.send({ profile:profile , user: user})
+            Token.findOne({ user: mongoose.Types.ObjectId(req.params.id) }).then(function (token) {
+              res.send({ profile:profile , user: user, token:token})
+            });
           });
     });
   
   });
-
 
 
 
@@ -240,10 +241,6 @@ getMessaging().send(message)
 });
 
 
-
-
-
-
 router.put("/token", (req, res, next)=>{
 
  Token.find({user: mongoose.Types.ObjectId(req.body.id)}).then(function(value){
@@ -277,6 +274,13 @@ router.put("/token", (req, res, next)=>{
 
   })
 
+
+
+  router.get('/location', (req, res, next)=> {
+    Location.findOne({user: mongoose.Types.ObjectId(req.body.id)}).then(function(value){
+      res.send(value)
+    })
+  })
 
 
 

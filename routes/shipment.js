@@ -11,127 +11,303 @@ const Review = require('../models/review');
 const Delivery = require('../models/delivery');
 const Profile = require('../models/profile');
 const Earning = require('../models/earning');
+const dist = require('geo-distance-js');
 
 
 
-// import { initializeApp } from "firebase/app";
-var fs = require("firebase-admin");
+const { initializeApp } = require('firebase/app');
+const { getFirestore, collection, getDocs, setDoc, doc, getDoc, deleteDoc, query, where } = require('firebase/firestore');
+const Token = require('../models/token');
+const Location = require('../models/location');
+// Follow this pattern to import other Firebase services
+// import { } from 'firebase/<service>';
 
+// TODO: Replace the following with your app's Firebase project configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDBnekqd2WPkz54neo84u8xyOuhPU4EzzU",
+  authDomain: "dash-34c0d.firebaseapp.com",
+  databaseURL: "https://dash-34c0d-default-rtdb.firebaseio.com",
+  projectId: "dash-34c0d",
+  storageBucket: "dash-34c0d.appspot.com",
+  messagingSenderId: "20886918141",
+  appId: "1:20886918141:web:0409d7224fd45df1f27f94",
+  measurementId: "G-G8T92H1L50"
+};
 
-const serviceAccount = require('../dash.json');
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-fs.initializeApp({
- credential: fs.credential.cert(serviceAccount)
-});
+// Get a list of cities from your database
+// async function getCities(db) {
+//   const citiesCol = collection(db, 'people');
+//   const citySnapshot = await getDocs(citiesCol);
+//   const cityList = citySnapshot.docs.map(doc => doc.data());
+//   return cityList;
+// }
 
-
-const db = fs.firestore();
-
-
-
-
- router.get("/addfire", async (req, res, next) => {
-  const usersDb = db.collection('users'); 
-  const liam = usersDb.doc('lragozzine'); 
-  await liam.set({
-  first: 'Liam',
-  last: 'Ragozzine',
-  address: '133 5th St., San Francisco, CA',
-  birthday: '05/13/1990',
-  age: '30'
- });
-});
-
-
- router.delete("/review/:id", (req, res, next)=> {
-    Review.findByIdAndDelete({ _id:  mongoose.Types.ObjectId(req.params.id) }).then(function (
-        reviews
-    ) {
-        res.send({reviews});
-    }).catch(next);;
+async function setShipment(db, data) {
+  const shipmentRef = collection(db, 'shipment');
+  const shipmentSnapshot = await setDoc(doc(shipmentRef, `${data.reciever}-${data.owner}`), {
+    state: data.state,
+    shipType: data.shipType,
+    reciever: data.reciever,
+    price: data.price,
+    owner: data.owner,
+    senderName: data.senderName,
+    senderPhone: data.senderPhone,
+    recieverName: data.recieverName,
+    recieverPhone: data.recieverPhone,
+    pickupLan: data.pickupLan,
+    dropoffLan: data.dropoffLan,
+    pickupLog: data.pickupLog,
+    itemName: data.itemName,
+    dropoffLog: data.dropoffLog,
+    mode: data.mode,
+    status: data.status
   });
-  
+  return shipmentSnapshot;
+}
+
+
+async function deleteShipment(db, id){
+  const shipmentRef = collection(db, 'shipment');
+  const shipmentSnapshot = await deleteDoc(doc(shipmentRef, id));
+  return shipmentSnapshot;
+}
+
+
+async function deletOwnerShipment(db, id){
+  const shipmentRef = collection(db, 'shipment');
+  const q = query(shipmentRef, where("owner", "==", id));
+  // const citySnapshot = await getDocs(shipmentRef);
+  const querySnapshot = await getDocs(q);
+  // const shipmentSnapshot = await deleteDoc(doc(shipmentRef, id));
+   const cityList = querySnapshot.docs.map((docx)=>{
+    deleteDoc(doc(shipmentRef, docx.id));
+   });
+}
+// async function getSingleCity(db) {
+//   const citiesCol = collection(db, 'people');
+//   const citySnapshot = await doc(citiesCol, '1');
+//   // const cityList = citySnapshot.docs.map(doc => doc.data());
+//   return citySnapshot;
+// }
+
+
+// router.get("/fire", async (req, res, next)=> {
+//   // const fr =  firestore.collection("people").doc("1").get().catch(next);
+//   deletOwnerShipment(db, "637a634049d6e52a51db448a")
+//   // console.log(booksRef)
+//   res.send({message: "done"});
+// })
 
 
 
 
-      router.get("/getshipment", (req, res, next) => {
-        Delivery.find({ user: mongoose.Types.ObjectId(req.body.userID), status: req.body.status}).populate("poster").then(function (delivery) {
-            res.send(delivery)
-        })
-      });
-    
 
-      router.get("/getallshipment", (req, res, next) => {
-        Delivery.find({ user: mongoose.Types.ObjectId(req.body.userID)}).populate("poster").then(function (delivery) {
-            res.send(delivery)
-        })
-      });
-    
-      
-    
-      router.post("/shipment",  (req, res, next)=>{
-        Delivery.create(req.body)
-              .then(function (delivery){
-                res.send(delivery);
-                }).catch(next);
+router.delete("/review/:id", (req, res, next) => {
+  Review.findByIdAndDelete({ _id: mongoose.Types.ObjectId(req.params.id) }).then(function (
+    reviews
+  ) {
+    res.send({ reviews });
+  }).catch(next);
+});
+
+
+
+
+
+router.get("/getshipment", (req, res, next) => {
+  Delivery.find({ user: mongoose.Types.ObjectId(req.body.userID), status: req.body.status }).populate("poster").then(function (delivery) {
+    res.send(delivery)
+  })
+});
+
+
+router.get("/getallshipment", (req, res, next) => {
+  Delivery.find({ user: mongoose.Types.ObjectId(req.body.userID) }).populate("poster").then(function (delivery) {
+    res.send(delivery)
+  })
+});
+
+
+
+const sendNotification = (located_driver, title, body) => {
+  Token.find({ user: mongoose.Types.ObjectId(located_driver.user._id.toString()) }).then(function (value) {
+    if (value == 0) {
+      // res.status(200).send({ message: "failed" });
+      console.log("failed");
+    } else {
+      console.log("working");
+      value.map((e) => {
+        const message = {
+          notification: {
+            title: title,
+            body: body,
+          },
+          data: {
+            score: '850',
+            time: '2:45'
+          },
+          token: value[0].token,
+        };
+
+        // Send a message to the device corresponding to the provided
+        // registration token.
+        getMessaging().send(message)
+          .then((response) => {
+            // Response is a message ID string.
+            console.log('Successfully sent message:', response);
+            // res.status(200).send({ message: response });
           })
+          .catch((error) => {
+            console.log('Error sending message:', error);
+            // res.status(200).send({ message: error });
+          });
+      })
+    }
+  });
+}
 
-          
 
-          router.update("/shipmentupdate/:id", async (request, response, next) => {
+function calcCrow(lat1, lon1, lat2, lon2) 
+{
+  var R = 6371; // km
+  var dLat = toRad(lat2-lat1);
+  var dLon = toRad(lon2-lon1);
+  var lat1 = toRad(lat1);
+  var lat2 = toRad(lat2);
 
-           if(request.body.status == "completed"){
-            Delivery.findByIdAndUpdate(
-              { _id: mongoose.Types.ObjectId(request.params.id) },
-             {status: "completed"},
-          
-              function (err, docs) {
-                if (err) {
-                  response.status(400).send({ message: "failed to update" });
-                } else {
-                  // response.send(docs);
-                  // res.send(docs);
-                  Profile.findOne({_id: mongoose.Types.ObjectId(request.body.profileID)}).then(
-                    function(profile){
-                      Profile.findByIdAndUpdate(
-                        {_id: mongoose.Types.ObjectId(req.body.profileID)},
-                        {todayEarn: (Number(profile.todayEarn)+Number(request.body.price)).toString()},
-                        function (err, docs) {
-                          if (err) {
-                            res.status(400).send({ message: "failed to update" });
-                          } else {
-                        
-                            Earning.create(
-                           { amount: request.body.price,
-                            date: request.body.date,
-                            user: mongoose.Types.ObjectId(req.body.userID)}
-                            )
-                            
-                          }
-                        }
-                      );
-                    }
-                  )
+  var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2); 
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+  var d = R * c;
+  return d;
+}
+
+// Converts numeric degrees to radians
+function toRad(Value) 
+{
+    return Value * Math.PI / 180;
+}
+
+
+
+router.post("/shipment", async (req, res, next) => {
+
+  let located_drivers = []
+  let located_drivers_temp = []
+  //get closest drivers available
+  const locations = await Location.find({}).populate("user");
+ 
+  locations.forEach(function (location) {
+    const distance_in_meter = calcCrow(Number(location.lan), Number(location.long), Number(req.body.lan), Number(req.body.long)).toFixed(1);
+    if (Number(distance_in_meter) <= Number(10000)) {
+     located_drivers_temp.push(location)
+     located_drivers = located_drivers_temp;
+    }
+  });
+
+
+  //send notifications to available drivers
+  located_drivers.forEach(function (located_driver) {
+    
+    const data = {
+      state: req.body.state,
+      shipType: req.body.shipType,
+      reciever: located_driver.user._id.toString(),
+      price: req.body.price,
+      owner: req.body.owner,
+      senderName: req.body.senderName,
+      senderPhone: req.body.senderPhone,
+      recieverName: req.body.recieverName,
+      recieverPhone: req.body.recieverPhone,
+      pickupLan: req.body.pickupLan,
+      dropoffLan: req.body.dropoffLan,
+      pickupLog: req.body.pickupLog,
+      itemName: req.body.itemName,
+      dropoffLog: req.body.dropoffLog,
+      mode: req.body.mode,
+      status: req.body.status
+    }
+    
+
+    sendNotification(located_driver)
+    setShipment(db, data);
+  });
+
+  delete req.body.lan
+  delete req.body.long
+
+  Delivery.create(req.body)
+        .then(function (delivery){
+          res.send(delivery);
+          }).catch(next);
+})
+
+
+router.put("/shipment-accepted", async (request, response, next) => {
+
+  if (request.body.status == "accepted") {
+    Delivery.findByIdAndUpdate(
+      { _id: mongoose.Types.ObjectId(request.body.id) },
+      { status: "ongoing" , reciever: mongoose.Types.ObjectId(request.body.reciever)},
+
+      function (err, docs) {
+        if (err) {
+          response.status(400).send({ message: "failed to update" });
+        } else {
+           deletOwnerShipment(db, request.body.owner)
+          response.send({status: "accepted"});         
+        }
+      }
+    )
+  } else {
+     deleteShipment(db, `${request.body.reciever}-${request.body.owner}`)
+     response.send({status: "declined"});         
+  }
+})
+
+
+
+router.put("/shipment-complete/:id", async (request, response, next) => {
+    Delivery.findByIdAndUpdate(
+      { _id: mongoose.Types.ObjectId(request.params.id) },
+      { status: "completed" },
+
+      function (err, docs) {
+        if (err) {
+          response.status(400).send({ message: "failed to update" });
+        } else {
+          // response.send(docs);
+          // res.send(docs);
+          Profile.findOne({ _id: mongoose.Types.ObjectId(request.body.profileID) }).then(
+            function (profile) {
+              Profile.findByIdAndUpdate(
+                { _id: mongoose.Types.ObjectId(req.body.profileID) },
+                { todayEarn: (Number(profile.todayEarn) + Number(request.body.price)).toString() },
+                function (err, docs) {
+                  if (err) {
+                    res.status(400).send({ message: "failed to update" });
+                  } else {
+
+                    Earning.create(
+                      {
+                        amount: request.body.price,
+                        date: request.body.date,
+                        user: mongoose.Types.ObjectId(req.body.userID)
+                      }
+                    )
+
+                  }
                 }
-              }
-            )
-           }else{ Delivery.findByIdAndUpdate(
-            { _id: mongoose.Types.ObjectId(request.params.id) },
-            request.body,
-        
-            function (err, docs) {
-              if (err) {
-                response.status(400).send({ message: "failed to update" });
-              } else {
-                response.send(docs);
-                // res.send(docs);
-              }
+              );
             }
-          )}
-          
-          
-          })
+          )
+        }
+      }
+    )
+})
 
 
-  module.exports = router;
+module.exports = router;
