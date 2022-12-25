@@ -247,6 +247,8 @@ router.post("/shipment", async (req, res, next) => {
   delete req.body.lan
   delete req.body.long
 
+  req.body.status = "pending";
+
   Delivery.create(req.body)
         .then(function (delivery){
           res.send(delivery);
