@@ -192,6 +192,14 @@ function toRad(Value)
 }
 
 
+router.post("/shipment-price", async (req, res, next) => {
+    const distance = calcCrow(
+      Number(req.body.pickuplat), Number(req.body.pickuplon), 
+    Number(req.body.dropofflat), Number(req.body.dropofflon));
+   const distanceMiles =  Number(distance * 0.000621371)
+  const price = Number(distanceMiles * 550);
+  res.send({price:price, distance: distanceMiles})
+})
 
 router.post("/shipment", async (req, res, next) => {
 

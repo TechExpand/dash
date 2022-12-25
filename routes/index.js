@@ -13,9 +13,7 @@ const Profile = require('../models/profile');
 const router = express.Router();
 const mongoose = require('mongoose');
 const TOKEN_SECRET = "222hwhdhnnjduru838272@@$henncndbdhsjj333n33brnfn";
-
 module.exports = router;
-
 const saltRounds = 10;
 
 
@@ -152,10 +150,6 @@ router.post("/signup",  (req, res, next)=> {
 
 
 
-
-
-
-
   router.post("/login",  (req, res, next)=> {
     let { phone, password} = req.body;
     if (!phone || phone ==="" || !password || password=="") {
@@ -199,6 +193,8 @@ User.findOne({ phone: phone })
   });
 
 
+
+
   router.get("/checkuser/:phone", (req, res, next)=> {
     User.findOne({phone: req.params.phone}).then(function (users) {
        if(users){
@@ -208,7 +204,6 @@ User.findOne({ phone: phone })
        }
     });
   });
-
 
 
 
@@ -243,7 +238,6 @@ User.findOne({ phone: phone })
   })
 
 
-  
   
   router.post("/verifyotp/:serviceID/:code", async (req, res, next) => {
     Verify.findOne({
@@ -291,7 +285,6 @@ User.findOne({ phone: phone })
     })
     .catch(next);
   });
-
 
 
 
