@@ -197,7 +197,7 @@ router.post("/shipment-price", async (req, res, next) => {
       Number(req.body.pickuplat), Number(req.body.pickuplon), 
     Number(req.body.dropofflat), Number(req.body.dropofflon));
    const distanceMiles =  Number(distance * 0.000621371)
-  const price = Number(distanceMiles * 550);
+  const price = Math.ceil(Number(distanceMiles * 550));
   res.send({price:price, distance: distanceMiles})
 })
 
