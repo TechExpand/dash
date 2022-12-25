@@ -19,6 +19,8 @@ const { initializeApp } = require('firebase/app');
 const { getFirestore, collection, getDocs, setDoc, doc, getDoc, deleteDoc, query, where } = require('firebase/firestore');
 const Token = require('../models/token');
 const Location = require('../models/location');
+const { getMessaging } = require('firebase/messaging');
+
 // Follow this pattern to import other Firebase services
 // import { } from 'firebase/<service>';
 
@@ -36,6 +38,8 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
+// const messaging = getMessaging(app);
 
 // Get a list of cities from your database
 // async function getCities(db) {
@@ -170,6 +174,7 @@ const sendNotification = (located_driver, title, body) => {
 }
 
 
+
 function calcCrow(lat1, lon1, lat2, lon2) 
 {
   var R = 6371; // km
@@ -202,7 +207,7 @@ router.post("/shipment-price", async (req, res, next) => {
 })
 
 router.post("/shipment", async (req, res, next) => {
-
+  req.body.status = "pending";
   let located_drivers = []
   let located_drivers_temp = []
   //get closest drivers available
@@ -240,14 +245,12 @@ router.post("/shipment", async (req, res, next) => {
     }
     
 
-    sendNotification(located_driver)
+    // sendNotification(located_driver, `${req.body.senderName} is requesting for your service`, body)
     setShipment(db, data);
   });
 
   delete req.body.lan
   delete req.body.long
-
-  req.body.status = "pending";
 
   Delivery.create(req.body)
         .then(function (delivery){
@@ -263,10 +266,33 @@ router.put("/shipment-accepted", async (request, response, next) => {
       { _id: mongoose.Types.ObjectId(request.body.id) },
       { status: "ongoing" , reciever: mongoose.Types.ObjectId(request.body.reciever)},
 
-      function (err, docs) {
+      async function (err, docs) {
+        
+        const data = {
+          _id: docs._id.toString(),
+          state: docs.state,
+          shipType: docs.shipType,
+          reciever: docs.reciever.toString(),
+          price: docs.price,
+          owner: docs.owner.toString(),
+          senderName: docs.senderName,
+          senderPhone: docs.senderPhone,
+          recieverName: docs.recieverName,
+          recieverPhone: docs.recieverPhone,
+          pickupLan: docs.pickupLan,
+          dropoffLan: docs.dropoffLan,
+          pickupLog: docs.pickupLog,
+          itemName: docs.itemName,
+          dropoffLog: docs.dropoffLog,
+          mode: docs.mode,
+          status: docs.status
+        }
+        console.log(data)
         if (err) {
           response.status(400).send({ message: "failed to update" });
         } else {
+          const shipmentRef = collection(db, 'myshipment');
+          await setDoc(doc(shipmentRef), data);
            deletOwnerShipment(db, request.body.owner)
           response.send({status: "accepted"});         
         }

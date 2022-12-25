@@ -20,19 +20,28 @@ const Token = require('../models/token');
 
 
 
-
+const { initializeApp } = require('firebase/app');
 const Profile = require('../models/profile');
 const Location = require('../models/location');
 
+const { getMessaging } = require('firebase/messaging');
 
-var admin = require("firebase-admin");
-const { getMessaging } = require('firebase-admin/messaging');
+const firebaseConfig = {
+  apiKey: "AIzaSyDBnekqd2WPkz54neo84u8xyOuhPU4EzzU",
+  authDomain: "dash-34c0d.firebaseapp.com",
+  databaseURL: "https://dash-34c0d-default-rtdb.firebaseio.com",
+  projectId: "dash-34c0d",
+  storageBucket: "dash-34c0d.appspot.com",
+  messagingSenderId: "20886918141",
+  appId: "1:20886918141:web:0409d7224fd45df1f27f94",
+  measurementId: "G-G8T92H1L50"
+};
 
-var serviceAccount = require("../keys/key.json");
+// const app = initializeApp(firebaseConfig);
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
+// const messaging = getMessaging(app);
+
+
 
 
 
@@ -209,6 +218,7 @@ router.get("/getriderprofile/:id", (req, res, next) => {
 
 
 
+
 router.post("/sendtoken", (req, res, next) => {
   Token.find({ user: mongoose.Types.ObjectId(req.body.id) }).then(function (value) {
     if(value == 0){
@@ -240,6 +250,10 @@ getMessaging().send(message)
     console.log('Error sending message:', error);
     res.status(200).send({ message: error });
   });
+
+// res.status(200).send({ message: response });
+
+
     }
   });
 });
@@ -325,6 +339,6 @@ router.put("/token", (req, res, next)=>{
 
 
 
-  
+
 
 module.exports = router;
