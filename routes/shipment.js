@@ -272,7 +272,7 @@ router.put("/shipment-accepted", async (request, response, next) => {
           _id: docs._id.toString(),
           state: docs.state,
           shipType: docs.shipType,
-          reciever: docs.reciever.toString(),
+          reciever: request.body.reciever,
           price: docs.price,
           owner: docs.owner.toString(),
           senderName: docs.senderName,
