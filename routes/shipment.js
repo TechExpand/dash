@@ -221,7 +221,12 @@ router.post("/shipment-price", async (req, res, next) => {
     if(distanceMiles>=15){
       const price = Math.ceil(Number(distanceMiles * 150));
       res.send({price:price, distance: distanceMiles})
-    }else{
+    }
+    else if(distanceMiles<=4){
+      const price = Math.ceil(Number(distanceMiles * 450));
+      res.send({price:price, distance: distanceMiles})
+    }
+    else{
       const price = Math.ceil(Number(distanceMiles * 200));
       res.send({price:price, distance: distanceMiles})
     }
