@@ -11,7 +11,7 @@ const Review = require('../models/review');
 const Delivery = require('../models/delivery');
 const Profile = require('../models/profile');
 const Earning = require('../models/earning');
-const dist = require('geo-distance-js');
+const axios = require("axios")
 
 
 
@@ -20,6 +20,7 @@ const { getFirestore, collection, getDocs, setDoc, doc, getDoc, deleteDoc, query
 const Token = require('../models/token');
 const Location = require('../models/location');
 const { getMessaging } = require('firebase/messaging');
+const User = require('../models/user');
 
 // Follow this pattern to import other Firebase services
 // import { } from 'firebase/<service>';
@@ -82,6 +83,18 @@ async function deleteShipment(db, id){
 
 async function deletOwnerShipment(db, id){
   const shipmentRef = collection(db, 'shipment');
+  const q = query(shipmentRef, where("owner", "==", id));
+  // const citySnapshot = await getDocs(shipmentRef);
+  const querySnapshot = await getDocs(q);
+  // const shipmentSnapshot = await deleteDoc(doc(shipmentRef, id));
+   const cityList = querySnapshot.docs.map((docx)=>{
+    deleteDoc(doc(shipmentRef, docx.id));
+   });
+}
+
+
+async function deletOwnerMyShipment(db, id){
+  const shipmentRef = collection(db, 'myshipment');
   const q = query(shipmentRef, where("owner", "==", id));
   // const citySnapshot = await getDocs(shipmentRef);
   const querySnapshot = await getDocs(q);
@@ -189,7 +202,7 @@ function calcCrow(lat1, lon1, lat2, lon2)
   var d = R * c;
   return d;
 }
-
+// 
 // Converts numeric degrees to radians
 function toRad(Value) 
 {
@@ -198,12 +211,26 @@ function toRad(Value)
 
 
 router.post("/shipment-price", async (req, res, next) => {
-    const distance = calcCrow(
-      Number(req.body.pickuplat), Number(req.body.pickuplon), 
-    Number(req.body.dropofflat), Number(req.body.dropofflon));
-   const distanceMiles =  Number(distance * 0.000621371)
-  const price = Math.ceil(Number(distanceMiles * 1000));
-  res.send({price:price, distance: distanceMiles})
+  try {
+		const response = await axios({
+			url: `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${req.body.origins}&destinations=${req.body.destinations}&key=AIzaSyD_XyglyuykJKDO_POLeNkyLQJuQf5TzJo`,
+			method: "get",
+		});
+    const distance = Number(response.data.rows[0].elements[0].distance.text.toString().slice(response.data.rows[0].elements[0].distance.text.toString(), response.data.rows[0].elements[0].distance.text.toString().length-3))
+    const distanceMiles =  Number(distance * 0.621)
+     const price = Math.ceil(Number(distanceMiles * 220));
+		res.status(200).json(price);
+	} catch (err) {
+		res.status(500).json({ message: err });
+	}
+
+
+  //   const distance = calcCrow(
+  //     Number(req.body.pickuplat), Number(req.body.pickuplon), 
+  //   Number(req.body.dropofflat), Number(req.body.dropofflon));
+ 
+  // const price = Math.ceil(Number(distanceMiles * 1000));
+  // res.send({price:price, distance: distanceMiles})
 })
 
 router.post("/shipment", async (req, res, next) => {
@@ -264,38 +291,49 @@ router.put("/shipment-accepted", async (request, response, next) => {
   if (request.body.status == "accepted") {
     Delivery.findByIdAndUpdate(
       { _id: mongoose.Types.ObjectId(request.body.id) },
-      { status: "ongoing" , reciever: mongoose.Types.ObjectId(request.body.reciever)},
+      { status: "processing" , reciever: mongoose.Types.ObjectId(request.body.reciever)},
 
       async function (err, docs) {
+
+
+        User.findOne({ _id: mongoose.Types.ObjectId(request.body.reciever) }).then(function (user) {
+          Profile.findOne({ user: mongoose.Types.ObjectId(request.body.reciever) }).then(async function (profile) {
+                // res.send({ profile:profile , user: user})
+                user.password = "";
+                const data = {
+                  _id: docs._id.toString(),
+                  state: docs.state,
+                  shipType: docs.shipType,
+                  reciever: request.body.reciever,
+                  recieverprofileinfo: JSON.parse(JSON.stringify(profile)),
+                  recieveruserinfo: JSON.parse(JSON.stringify(user)) ,
+                  price: docs.price,
+                  owner: docs.owner.toString(),
+                  senderName: docs.senderName,
+                  senderPhone: docs.senderPhone,
+                  recieverName: docs.recieverName,
+                  recieverPhone: docs.recieverPhone,
+                  pickupLan: docs.pickupLan,
+                  dropoffLan: docs.dropoffLan,
+                  pickupLog: docs.pickupLog,
+                  itemName: docs.itemName,
+                  dropoffLog: docs.dropoffLog,
+                  mode: docs.mode,
+                  status: docs.status
+                }
+                console.log(profile)
+                if (err) {
+                  response.status(400).send({ message: "failed to update" });
+                } else {
+                  const shipmentRef = collection(db, 'myshipment');
+                  await setDoc(doc(shipmentRef), data);
+                  //  deletOwnerShipment(db, request.body.owner)
+                  response.send({status: "accepted"});         
+                }
+            });
+      });
         
-        const data = {
-          _id: docs._id.toString(),
-          state: docs.state,
-          shipType: docs.shipType,
-          reciever: request.body.reciever,
-          price: docs.price,
-          owner: docs.owner.toString(),
-          senderName: docs.senderName,
-          senderPhone: docs.senderPhone,
-          recieverName: docs.recieverName,
-          recieverPhone: docs.recieverPhone,
-          pickupLan: docs.pickupLan,
-          dropoffLan: docs.dropoffLan,
-          pickupLog: docs.pickupLog,
-          itemName: docs.itemName,
-          dropoffLog: docs.dropoffLog,
-          mode: docs.mode,
-          status: docs.status
-        }
-        console.log(data)
-        if (err) {
-          response.status(400).send({ message: "failed to update" });
-        } else {
-          const shipmentRef = collection(db, 'myshipment');
-          await setDoc(doc(shipmentRef), data);
-           deletOwnerShipment(db, request.body.owner)
-          response.send({status: "accepted"});         
-        }
+  
       }
     )
   } else {
@@ -305,41 +343,57 @@ router.put("/shipment-accepted", async (request, response, next) => {
 })
 
 
-
-router.put("/shipment-complete/:id", async (request, response, next) => {
+router.put("/shipment-started", async (request, response, next) => {
     Delivery.findByIdAndUpdate(
-      { _id: mongoose.Types.ObjectId(request.params.id) },
+      { _id: mongoose.Types.ObjectId(request.body.id) },
+      { status: "started" , reciever: mongoose.Types.ObjectId(request.body.reciever)},
+
+      async function (err, docs) {
+        Profile.findOne({ _id: mongoose.Types.ObjectId(request.body.profileID) }).then(
+          function (profile) {
+            Profile.findByIdAndUpdate(
+              { _id: mongoose.Types.ObjectId(req.body.profileID) },
+              { todayEarn: (Number(profile.todayEarn) + Number(request.body.price)).toString() },
+              function (err, docs) {
+                if (err) {
+                  res.status(400).send({ message: "failed to update" });
+                } else {
+                  Earning.create(
+                    {
+                      amount: request.body.price,
+                      date: request.body.date,
+                      user: mongoose.Types.ObjectId(req.body.owner)
+                    }
+                  ).then(function(vaue){
+                    deletOwnerShipment(db, request.body.owner)
+                    deletOwnerMyShipment(db, request.body.owner)
+                    response.send({status: "started"});  
+                  })
+
+                }
+              }
+            );
+          }
+        )       
+      }
+    )
+  
+})
+
+
+
+router.put("/shipment-complete", async (request, response, next) => {
+    Delivery.findByIdAndUpdate(
+      { _id: mongoose.Types.ObjectId(request.body.id) },
       { status: "completed" },
 
       function (err, docs) {
         if (err) {
           response.status(400).send({ message: "failed to update" });
         } else {
-          // response.send(docs);
+          response.send(docs);
           // res.send(docs);
-          Profile.findOne({ _id: mongoose.Types.ObjectId(request.body.profileID) }).then(
-            function (profile) {
-              Profile.findByIdAndUpdate(
-                { _id: mongoose.Types.ObjectId(req.body.profileID) },
-                { todayEarn: (Number(profile.todayEarn) + Number(request.body.price)).toString() },
-                function (err, docs) {
-                  if (err) {
-                    res.status(400).send({ message: "failed to update" });
-                  } else {
-
-                    Earning.create(
-                      {
-                        amount: request.body.price,
-                        date: request.body.date,
-                        user: mongoose.Types.ObjectId(req.body.userID)
-                      }
-                    )
-
-                  }
-                }
-              );
-            }
-          )
+         
         }
       }
     )
