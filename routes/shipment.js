@@ -365,17 +365,17 @@ router.put("/shipment-started", async (request, response, next) => {
         Profile.findOne({ _id: mongoose.Types.ObjectId(request.body.profileID) }).then(
           function (profile) {
             Profile.findByIdAndUpdate(
-              { _id: mongoose.Types.ObjectId(req.body.profileID) },
+              { _id: mongoose.Types.ObjectId(request.body.profileID) },
               { todayEarn: (Number(profile.todayEarn) + Number(request.body.price)).toString() },
               function (err, docs) {
                 if (err) {
-                  res.status(400).send({ message: "failed to update" });
+                  response.status(400).send({ message: "failed to update" });
                 } else {
                   Earning.create(
                     {
                       amount: request.body.price,
                       date: request.body.date,
-                      user: mongoose.Types.ObjectId(req.body.owner)
+                      user: mongoose.Types.ObjectId(request.body.owner)
                     }
                   ).then(function(vaue){
                     deletOwnerShipment(db, request.body.owner)
