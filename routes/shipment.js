@@ -16,7 +16,7 @@ const axios = require("axios")
 
 
 const { initializeApp } = require('firebase/app');
-const { getFirestore, collection, getDocs, setDoc, doc, getDoc, deleteDoc, query, where } = require('firebase/firestore');
+const { getFirestore, collection, getDocs, setDoc, doc, getDoc, deleteDoc, query, where, updateDoc } = require('firebase/firestore');
 const Token = require('../models/token');
 const Location = require('../models/location');
 const { getMessaging } = require('firebase/messaging');
@@ -56,6 +56,10 @@ async function setShipment(db, data) {
     state: data.state,
     shipType: data.shipType,
     reciever: data.reciever,
+    deliveryID: data.deliveryID,
+    pickup: data.pickup,
+    dropoff: data.dropoff,
+    image: data.image,
     price: data.price,
     owner: data.owner,
     senderName: data.senderName,
@@ -79,6 +83,13 @@ async function deleteShipment(db, id){
   const shipmentSnapshot = await deleteDoc(doc(shipmentRef, id));
   return shipmentSnapshot;
 }
+
+async function updateOwnerShipment(db, id){
+  const shipmentRef = collection(db, 'shipment');
+  const shipmentSnapshot = await updateDoc(doc(shipmentRef, id), {status: "processing"});
+  return shipmentSnapshot;
+}
+
 
 
 async function deletOwnerShipment(db, id){
@@ -246,6 +257,8 @@ router.post("/shipment-price", async (req, res, next) => {
   // res.send({price:price, distance: distanceMiles})
 })
 
+
+
 router.post("/shipment", async (req, res, next) => {
   req.body.status = "pending";
   let located_drivers = []
@@ -262,9 +275,14 @@ router.post("/shipment", async (req, res, next) => {
   });
 
 
-  //send notifications to available drivers
+
+  delete req.body.lan
+  delete req.body.long
+
+  Delivery.create(req.body)
+        .then(function (delivery){
+            //send notifications to available drivers
   located_drivers.forEach(function (located_driver) {
-    
     const data = {
       state: req.body.state,
       shipType: req.body.shipType,
@@ -276,9 +294,13 @@ router.post("/shipment", async (req, res, next) => {
       recieverName: req.body.recieverName,
       recieverPhone: req.body.recieverPhone,
       pickupLan: req.body.pickupLan,
+      pickup: req.body.pickup,
+      image: req.body.image,
+      dropoff: req.body.dropoff,
       dropoffLan: req.body.dropoffLan,
       pickupLog: req.body.pickupLog,
       itemName: req.body.itemName,
+      deliveryID: delivery._id.toString(),
       dropoffLog: req.body.dropoffLog,
       mode: req.body.mode,
       status: req.body.status
@@ -287,14 +309,12 @@ router.post("/shipment", async (req, res, next) => {
 
     // sendNotification(located_driver, `${req.body.senderName} is requesting for your service`, body)
     setShipment(db, data);
+
+    
   });
 
-  delete req.body.lan
-  delete req.body.long
-
-  Delivery.create(req.body)
-        .then(function (delivery){
-          res.send(delivery);
+  res.send(delivery);
+        
           }).catch(next);
 })
 
@@ -340,7 +360,7 @@ router.put("/shipment-accepted", async (request, response, next) => {
                 } else {
                   const shipmentRef = collection(db, 'myshipment');
                   await setDoc(doc(shipmentRef), data);
-                  //  deletOwnerShipment(db, request.body.owner)
+                  updateOwnerShipment(db, `${request.body.reciever}-${request.body.owner}`)
                   response.send({status: "accepted"});         
                 }
             });
