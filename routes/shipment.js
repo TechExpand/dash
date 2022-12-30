@@ -145,8 +145,15 @@ router.delete("/review/:id", (req, res, next) => {
 
 
 
-router.get("/getshipment", (req, res, next) => {
-  Delivery.find({ user: mongoose.Types.ObjectId(req.body.userID), status: req.body.status }).populate("poster").then(function (delivery) {
+router.get("/getownershipment", (req, res, next) => {
+  Delivery.find({ owner: mongoose.Types.ObjectId(req.body.userID), status: req.body.status }).populate("owner").populate("reciever").then(function (delivery) {
+    res.send(delivery)
+  })
+});
+
+
+router.get("/getrecievershipment", (req, res, next) => {
+  Delivery.find({ owner: mongoose.Types.ObjectId(req.body.userID), status: req.body.status }).populate("owner").populate("reciever").then(function (delivery) {
     res.send(delivery)
   })
 });
