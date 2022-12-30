@@ -153,7 +153,7 @@ router.get("/getownershipment/:userID", (req, res, next) => {
 
 
 router.get("/getrecievershipment/:userID", (req, res, next) => {
-  Delivery.find({ reciever: mongoose.Types.ObjectId(req.params.userID)}).populate("owner").populate("reciever").ord.then(function (delivery) {
+  Delivery.find({ reciever: mongoose.Types.ObjectId(req.params.userID)}).populate("owner").populate("reciever").then(function (delivery) {
     delivery.reverse();
     res.send(delivery)
   })
