@@ -333,7 +333,7 @@ router.put("/shipment-accepted", async (request, response, next) => {
   if (request.body.status == "accepted") {
     Delivery.findByIdAndUpdate(
       { _id: mongoose.Types.ObjectId(request.body.id) },
-      { status: "processing" , reciever: mongoose.Types.ObjectId(request.body.reciever)},
+      { status: "processing"},
 
       async function (err, docs) {
 
