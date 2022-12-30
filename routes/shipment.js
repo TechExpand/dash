@@ -146,14 +146,14 @@ router.delete("/review/:id", (req, res, next) => {
 
 
 router.get("/getownershipment/:userID", (req, res, next) => {
-  Delivery.find({ owner: mongoose.Types.ObjectId(req.params.userID), status: req.body.status }).populate("owner").populate("reciever").then(function (delivery) {
+  Delivery.find({ owner: mongoose.Types.ObjectId(req.params.userID)}).populate("owner").populate("reciever").then(function (delivery) {
     res.send(delivery)
   })
 });
 
 
 router.get("/getrecievershipment/:userID", (req, res, next) => {
-  Delivery.find({ owner: mongoose.Types.ObjectId(req.params.userID), status: req.body.status }).populate("owner").populate("reciever").then(function (delivery) {
+  Delivery.find({ reciever: mongoose.Types.ObjectId(req.params.userID)}).populate("owner").populate("reciever").then(function (delivery) {
     res.send(delivery)
   })
 });
