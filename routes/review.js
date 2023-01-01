@@ -38,7 +38,7 @@ const Delivery = require('../models/delivery');
     
       
     
-      router.post("/review/shipmentId",  (req, res, next)=>{
+      router.post("/review/:shipmentId",  (req, res, next)=>{
         Delivery.findByIdAndUpdate(
           { _id: mongoose.Types.ObjectId(request.params.shipmentId) },
           { status: "reviewed"},
