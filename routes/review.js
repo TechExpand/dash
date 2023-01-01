@@ -36,11 +36,10 @@ const Review = require('../models/review');
     
       
     
-      router.post("/review/:id",  (req, res, next)=>{
+      router.post("/review",  (req, res, next)=>{
         Review.create(req.body)
               .then(function (review) {
-                res.send({ message: "updated" });
-        
+                res.send(review);
                 })
                 .catch(next);
           })
