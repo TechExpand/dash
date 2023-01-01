@@ -8,6 +8,7 @@ const router = express.Router();
 
 const Verification = require('../models/verification');
 const Review = require('../models/review');
+const Delivery = require('../models/delivery');
 
 
 
@@ -31,17 +32,26 @@ const Review = require('../models/review');
              reviews: review,
          })
         })
+        
       });
     
     
       
     
-      router.post("/review",  (req, res, next)=>{
-        Review.create(req.body)
-              .then(function (review) {
-                res.send(review);
-                })
-                .catch(next);
+      router.post("/review/shipmentId",  (req, res, next)=>{
+        Delivery.findByIdAndUpdate(
+          { _id: mongoose.Types.ObjectId(request.params.shipmentId) },
+          { status: "reviewed"},
+    
+          async function (err, docs) {
+            Review.create(req.body)
+            .then(function (review) {
+              res.send(review);
+              })
+              .catch(next);     
+          }
+        )
+       
           })
       
 
