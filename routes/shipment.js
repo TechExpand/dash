@@ -301,7 +301,6 @@ router.post("/shipment", async (req, res, next) => {
   let located_drivers = []
   let located_drivers_temp = []
   const roles = ["rider"]
-  //get closest drivers available
   const locations = await Location.find({}).populate("user", null, { name: { $in: roles } } );
  
   locations.forEach(function (location) {
