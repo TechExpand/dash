@@ -12,6 +12,7 @@ const DeliveryScema = new Schema({
     senderName: String,
     senderPhone: String,
     recieverName: String,
+    date: { type: String, default: null},
     recieverPhone: String,
     pickupLan: String,
     dropoffLan: String,

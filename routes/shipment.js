@@ -78,6 +78,20 @@ async function setShipment(db, data) {
 }
 
 
+
+async function setNotification(db, data) {
+  const notifyRef = collection(db, 'notification');
+  const notifySnapshot = await setDoc(doc(notifyRef), {
+    title: data.title,
+    body: data.body,
+    reciever: data.reciever.toString(),
+    deliveryID: data.deliveryID,
+    date: data.date,
+  });
+  return notifySnapshot;
+}
+
+
 async function deleteShipment(db, id){
   const shipmentRef = collection(db, 'shipment');
   const shipmentSnapshot = await deleteDoc(doc(shipmentRef, id));
@@ -171,38 +185,51 @@ router.get("/getallshipment", (req, res, next) => {
 
 
 const sendNotification = (located_driver, title, body) => {
+  const serverToken = "AAAABNz1E_0:APA91bEfLK_NRvFSWEIqBZnkXDyIewgZdU-gwm5l8MiNP3DXgIG2g0cKZU8mBGso7nkV7ZpDR0rBfcZxXGdgocR5ykByTk1hWdf5HH5qd1cOZdHXyk9Z_8rtWz4dxHmH0RooZWLcubb9";
   Token.find({ user: mongoose.Types.ObjectId(located_driver.user._id.toString()) }).then(function (value) {
     if (value == 0) {
       // res.status(200).send({ message: "failed" });
       console.log("failed");
     } else {
       console.log("working");
-      value.map((e) => {
-        const message = {
+      axios.post('https://fcm.googleapis.com/fcm/send',
+        JSON.stringify( {
           notification: {
             title: title,
             body: body,
+            sound: "alert.mp3",
           },
+          priority: 'high',
+          sound: "alert.mp3",
           data: {
-            score: '850',
-            time: '2:45'
+            click_action: 'FLUTTER_NOTIFICATION_CLICK',
+            id: '1',
+            sound: "alert.mp3",
           },
-          token: value[0].token,
-        };
-
-        // Send a message to the device corresponding to the provided
-        // registration token.
-        getMessaging().send(message)
-          .then((response) => {
-            // Response is a message ID string.
-            console.log('Successfully sent message:', response);
-            // res.status(200).send({ message: response });
-          })
-          .catch((error) => {
-            console.log('Error sending message:', error);
-            // res.status(200).send({ message: error });
-          });
-      })
+          apns: {
+            payload: {
+              aps: {
+                sound: "alert.mp3",
+              }
+            }
+          },
+          to: value[0].token,
+        }),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `key=${serverToken}`,
+          }
+        }
+        )
+        .then(function (response) {
+          console.log(response);
+          // res.send(response)
+        })
+        .catch(function (error) {
+          console.log({error:"failed"});
+          // res.status(500).send({error:"failed"})
+        });
     }
   });
 }
@@ -274,7 +301,7 @@ router.post("/shipment", async (req, res, next) => {
   let located_drivers = []
   let located_drivers_temp = []
   //get closest drivers available
-  const locations = await Location.find({}).populate("user");
+  const locations = await Location.find({}).populate("user", null, { name: { $in: roles } } );
  
   locations.forEach(function (location) {
     const distance_in_meter = calcCrow(Number(location.lan), Number(location.long), Number(req.body.lan), Number(req.body.long)).toFixed(1);
@@ -317,7 +344,7 @@ router.post("/shipment", async (req, res, next) => {
     }
     
 
-    // sendNotification(located_driver, `${req.body.senderName} is requesting for your service`, body)
+    sendNotification(located_driver, `Incoming request`, `${req.body.senderName} is requesting for your service`)
     setShipment(db, data);
 
     
@@ -371,6 +398,7 @@ router.put("/shipment-accepted", async (request, response, next) => {
                   const shipmentRef = collection(db, 'myshipment');
                   await setDoc(doc(shipmentRef), data);
                   updateOwnerShipment(db, `${request.body.reciever}-${request.body.owner}`)
+                 
                   response.send({status: "accepted"});         
                 }
             });
@@ -389,9 +417,9 @@ router.put("/shipment-accepted", async (request, response, next) => {
 router.put("/shipment-started", async (request, response, next) => {
     Delivery.findByIdAndUpdate(
       { _id: mongoose.Types.ObjectId(request.body.id) },
-      { status: "started" , reciever: mongoose.Types.ObjectId(request.body.reciever)},
+      { status: "started" , reciever: mongoose.Types.ObjectId(request.body.reciever), date: request.body.date  },
 
-      async function (err, docs) {
+      async function (err, docsD) {
         Profile.findOne({ _id: mongoose.Types.ObjectId(request.body.profileID) }).then(
           function (profile) {
             Profile.findByIdAndUpdate(
@@ -408,8 +436,30 @@ router.put("/shipment-started", async (request, response, next) => {
                       user: mongoose.Types.ObjectId(request.body.owner)
                     }
                   ).then(function(vaue){
+
                     deletOwnerShipment(db, request.body.owner)
                     deletOwnerMyShipment(db, request.body.owner)
+                  
+                    setNotification(db, {
+                      title: `Congratulations! Request accepted`,
+                      body: `${docsD.senderName} has accepted your request. you can now message`,
+                      deliveryID: request.body.id,
+                      reciever: request.body.reciever.toString(),
+                      date: request.body.date,
+                    });
+                    sendNotification({user:{_id: `${request.body.reciever}`.toString()}}, `Congratulations! Request accepted`, `${docsD.senderName} has accepted your request. you can now message`)
+                    const rejectedList = eval(request.body.rejectedusers.toString());
+                    console.log(rejectedList)
+                    rejectedList.forEach(function(e){
+                      setNotification(db, {
+                        title: `Sorry! Request declined`,
+                        body: `${docsD.senderName} has declined your request. goodluck next time`,
+                        deliveryID: request.body.id,
+                        reciever: e.toString(),
+                        date: request.body.date,
+                      });
+                      sendNotification({user:{_id: `${e}`.toString()}}, `Sorry! Request declined`, `${docsD.senderName} has declined your request. goodluck next time`)
+                    })
                     response.send({status: "started"});  
                   })
 

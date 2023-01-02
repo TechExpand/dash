@@ -20,22 +20,23 @@ const Token = require('../models/token');
 
 
 
-const { initializeApp } = require('firebase/app');
+// const { initializeApp } = require('firebase/app');
 const Profile = require('../models/profile');
 const Location = require('../models/location');
+// const { getMessaging } = require('firebase/messaging');
 
-const { getMessaging } = require('firebase/messaging');
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDBnekqd2WPkz54neo84u8xyOuhPU4EzzU",
-  authDomain: "dash-34c0d.firebaseapp.com",
-  databaseURL: "https://dash-34c0d-default-rtdb.firebaseio.com",
-  projectId: "dash-34c0d",
-  storageBucket: "dash-34c0d.appspot.com",
-  messagingSenderId: "20886918141",
-  appId: "1:20886918141:web:0409d7224fd45df1f27f94",
-  measurementId: "G-G8T92H1L50"
-};
+
+// const firebaseConfig = {
+//   apiKey: "AIzaSyDBnekqd2WPkz54neo84u8xyOuhPU4EzzU",
+//   authDomain: "dash-34c0d.firebaseapp.com",
+//   databaseURL: "https://dash-34c0d-default-rtdb.firebaseio.com",
+//   projectId: "dash-34c0d",
+//   storageBucket: "dash-34c0d.appspot.com",
+//   messagingSenderId: "20886918141",
+//   appId: "1:20886918141:web:0409d7224fd45df1f27f94",
+//   measurementId: "G-G8T92H1L50"
+// };
 
 // const app = initializeApp(firebaseConfig);
 
@@ -220,39 +221,51 @@ router.get("/getriderprofile/:id", (req, res, next) => {
 
 
 router.post("/sendtoken", (req, res, next) => {
+
+const serverToken = "AAAABNz1E_0:APA91bEfLK_NRvFSWEIqBZnkXDyIewgZdU-gwm5l8MiNP3DXgIG2g0cKZU8mBGso7nkV7ZpDR0rBfcZxXGdgocR5ykByTk1hWdf5HH5qd1cOZdHXyk9Z_8rtWz4dxHmH0RooZWLcubb9";
+ 
   Token.find({ user: mongoose.Types.ObjectId(req.body.id) }).then(function (value) {
     if(value == 0){
       res.status(200).send({ message: "failed" });
     }else{
-
-const message = {
+axios.post('https://fcm.googleapis.com/fcm/send',
+JSON.stringify( {
   notification: {
     title: req.body.title,
     body: req.body.body,
-
+    sound: "alert.mp3",
   },
+  priority: 'high',
+  sound: "alert.mp3",
   data: {
-    score: '850',
-    time: '2:45'
+    click_action: 'FLUTTER_NOTIFICATION_CLICK',
+    id: '1',
+    sound: "alert.mp3",
   },
-  token: value[0].token,
-};
-
-// Send a message to the device corresponding to the provided
-// registration token.
-getMessaging().send(message)
-  .then((response) => {
-    // Response is a message ID string.
-    console.log('Successfully sent message:', response);
-    res.status(200).send({ message: response });
-  })
-  .catch((error) => {
-    console.log('Error sending message:', error);
-    res.status(200).send({ message: error });
-  });
-
-// res.status(200).send({ message: response });
-
+  apns: {
+    payload: {
+      aps: {
+        sound: "alert.mp3",
+      }
+    }
+  },
+  to: value[0].token,
+}),
+{
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `key=${serverToken}`,
+  }
+}
+)
+.then(function (response) {
+  console.log(response);
+  res.send(response)
+})
+.catch(function (error) {
+  console.log(error.message);
+  res.status(500).send({error:"failed"})
+});
 
     }
   });
@@ -336,6 +349,7 @@ router.put("/token", (req, res, next)=>{
  })
 
   })
+
 
 
 
