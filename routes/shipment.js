@@ -301,8 +301,11 @@ router.post("/shipment", async (req, res, next) => {
   req.body.status = "pending";
   let located_drivers = []
   let located_drivers_temp = []
-  const roles = ["rider"]
-  const locations = await Location.find({}).populate("user", null, { name: { $in: roles } } );
+
+  const locations = await Location.find({});
+
+  console.log(locations)
+  console.log("done")
   locations.forEach(function (location) {
     const distance_in_meter = calcCrow(Number(location.lan), Number(location.long), Number(req.body.lan), Number(req.body.long)).toFixed(1);
     if (Number(distance_in_meter) <= Number(10000)) {
