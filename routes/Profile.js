@@ -121,7 +121,7 @@ router.post("/profileupdateimage/:id", upload.array("image"), async (request, re
         if (err) {
           response.status(400).send({ message: "failed to update" });
         } else {
-          response.send(docs);
+          response.send(request.body);
           // res.send(docs);
         }
       }
@@ -138,14 +138,13 @@ router.post("/profileupdateimage/:id", upload.array("image"), async (request, re
         if (err) {
           response.status(400).send({ message: "failed to update" });
         } else {
-          response.send(docs);
+          response.send(request.body);
           // res.send(docs);
         }
       }
     )
 
   }
-
 
 })
 
