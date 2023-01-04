@@ -94,13 +94,13 @@ const setNotification =  async  (db, data)=> {
 }
 
 
-async function deleteShipment(db, id){
+const deleteShipment = async (db, id)=>{
   const shipmentRef = collection(db, 'shipment');
   const shipmentSnapshot = await deleteDoc(doc(shipmentRef, id));
   return shipmentSnapshot;
 }
 
-async function updateOwnerShipment(db, id){
+const updateOwnerShipment = async (db, id)=>{
   const shipmentRef = collection(db, 'shipment');
   const shipmentSnapshot = await updateDoc(doc(shipmentRef, id), {status: "processing"});
   return shipmentSnapshot;
@@ -108,7 +108,7 @@ async function updateOwnerShipment(db, id){
 
 
 
-async function deletOwnerShipment(db, id){
+const deletOwnerShipment = async (db, id)=>{
   const shipmentRef = collection(db, 'shipment');
   const q = query(shipmentRef, where("owner", "==", id));
   // const citySnapshot = await getDocs(shipmentRef);
@@ -120,7 +120,7 @@ async function deletOwnerShipment(db, id){
 }
 
 
-async function deletOwnerMyShipment(db, id){
+const deletOwnerMyShipment = async (db, id)=>{
   const shipmentRef = collection(db, 'myshipment');
   const q = query(shipmentRef, where("owner", "==", id));
   // const citySnapshot = await getDocs(shipmentRef);
