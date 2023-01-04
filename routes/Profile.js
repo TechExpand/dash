@@ -23,6 +23,7 @@ const Token = require('../models/token');
 // const { initializeApp } = require('firebase/app');
 const Profile = require('../models/profile');
 const Location = require('../models/location');
+const Review = require('../models/review');
 // const { getMessaging } = require('firebase/messaging');
 
 
@@ -190,7 +191,33 @@ router.post("/profileupdate/:id", async (request, response, next) => {
   })
   
 
+  router.post("/paydebt/:id", async (request, response, next) => {
+    Profile.findOne({ _id: mongoose.Types.ObjectId(request.params.id) }).then(function(value){
+    if(Number(value.commisionBalance) > Number(request.body.commisionBalance)){
+      Profile.findByIdAndUpdate(
+        { _id: mongoose.Types.ObjectId(request.params.id) },
+        {commisionBalance: (Number(value.commisionBalance)- Number(request.body.commisionBalance)).toString()},
+    
+        function (err, docs) {
+          if (err) {
+            response.status(400).send({ message: "failed to update" });
+          } else {
+            response.send(docs);
+            // res.send(docs);
+          }
+        }
+      )
+    }else{
+      res.send({message: "amount cannot be greater than commission balance"})
+    }
+    })
 
+   
+
+   
+  
+  
+  })
 
 
 
@@ -208,7 +235,16 @@ router.get("/getriderprofile/:id", (req, res, next) => {
     User.findOne({ _id: mongoose.Types.ObjectId(req.params.id) }).then(function (user) {
         Profile.findOne({ user: mongoose.Types.ObjectId(req.params.id) }).then(function (profile) {
             Token.findOne({ user: mongoose.Types.ObjectId(req.params.id) }).then(function (token) {
-              res.send({ profile:profile , user: user, token:token})
+              Review.aggregate([
+                {$match: { user: mongoose.Types.ObjectId(req.params.id)}},
+                {$group: {
+                  _id: null,
+                  rate: { $avg: { $toDouble: "$rate" }}
+                }}
+              ]).then(function(reviews){
+                // res.send(reviews)
+                res.send({ profile:profile , user: user, token:token, reviews: reviews.length==0?0.0:reviews[0].rate})
+              }) 
             });
           });
     });
@@ -216,6 +252,14 @@ router.get("/getriderprofile/:id", (req, res, next) => {
   });
 
 
+
+
+  router.get("/getrate/:id", (req, res, next) => {
+    Review.findOne({ _id: mongoose.Types.ObjectId(req.params.id) }).then(function (review) {
+       
+    });
+  
+  });
 
 
 

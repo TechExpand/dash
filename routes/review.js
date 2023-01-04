@@ -25,17 +25,30 @@ const Delivery = require('../models/delivery');
 
 
 
-      router.get("/getreviews/:userID", (req, res, next) => {
-    
-        Review.find({ user: mongoose.Types.ObjectId(req.params.userID)}).populate("poster").then(function (review) {
-            res.send({
-             reviews: review,
-         })
-        })
+      router.get("/getreviews/:userID", async (req, res, next) => {
+       Review.aggregate([
+        {$match: { user: mongoose.Types.ObjectId(req.params.userID)}},
+        {$group: {
+          _id: null,
+          rate: { $avg: { $toDouble: "$rate" }}
+        }}
+      ]).then(function(reviews){
+        res.send(reviews)
+      }) 
+        
+
+     
+
+        // find({ user: mongoose.Types.ObjectId(req.params.userID)}).then(function (review) {
+        //     res.send({
+        //      reviews: review,
+        //  })
+        // })
         
       });
     
-    
+
+
       
     
       router.post("/review/:shipmentId",  (req, res, next)=>{
