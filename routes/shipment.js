@@ -461,7 +461,7 @@ router.put("/shipment-started", async (request, response, next) => {
                     {
                       amount: request.body.price,
                       date: request.body.date,
-                      user: mongoose.Types.ObjectId(request.body.owner)
+                      user: mongoose.Types.ObjectId(request.body.reciever)
                     }
                   ).then(function(vaue){
 
