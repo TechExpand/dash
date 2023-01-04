@@ -17,6 +17,7 @@ const fs = require("fs");
 const Verify = require('../models/verify');
 // const Pin = require('../models/pin');
 const Token = require('../models/token');
+const Earning = require('../models/earning');
 
 
 
