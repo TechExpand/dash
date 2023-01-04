@@ -194,7 +194,7 @@ router.post("/profileupdate/:id", async (request, response, next) => {
 
   router.post("/paydebt", async (request, response, next) => {
     Profile.findOne({ user: mongoose.Types.ObjectId(request.body.userId) }).then(function(value){
-    if(Number(value.commisionBalance) > Number(request.body.commisionBalance)){
+    // if(Number(value.commisionBalance) > Number(request.body.commisionBalance)){
       Profile.findByIdAndUpdate(
         { _id: mongoose.Types.ObjectId(request.body.profileId) },
         {commisionBalance: (Number(value.commisionBalance)- Number(request.body.commisionBalance)).toString()},
@@ -207,9 +207,9 @@ router.post("/profileupdate/:id", async (request, response, next) => {
           }
         }
       )
-    }else{
-      response.send({message: "amount cannot be greater than commission balance"})
-    }
+    // }else{
+    //   response.send({message: "amount cannot be greater than commission balance"})
+    // }
     })
 
    
