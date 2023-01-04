@@ -52,7 +52,7 @@ const db = getFirestore(app);
 //   return cityList;
 // }
 
-async function setShipment(db, data) {
+const setShipment =  async (db, data)=> {
   const shipmentRef = collection(db, 'shipment');
   const shipmentSnapshot = await setDoc(doc(shipmentRef, `${data.reciever}-${data.owner}`), {
     state: data.state,
@@ -81,7 +81,7 @@ async function setShipment(db, data) {
 
 
 
-async function setNotification(db, data) {
+const setNotification =  async  (db, data)=> {
   const notifyRef = collection(db, 'notification');
   const notifySnapshot = await setDoc(doc(notifyRef), {
     title: data.title,
@@ -319,9 +319,9 @@ router.post("/shipment", async (req, res, next) => {
   delete req.body.long
 
   Delivery.create(req.body)
-        .then(function (delivery){
+        .then(async function (delivery){
             //send notifications to available drivers
-  located_drivers.forEach(function (located_driver) {
+   located_drivers.forEach(function (located_driver) {
     const data = {
       state: req.body.state,
       shipType: req.body.shipType,
@@ -346,10 +346,8 @@ router.post("/shipment", async (req, res, next) => {
     }
     
 
-    sendNotification(located_driver, `Incoming request`, `${req.body.senderName} is requesting for your service`)
-    setShipment(db, data);
-
-    
+     sendNotification(located_driver, `Incoming request`, `${req.body.senderName} is requesting for your service`)
+     setShipment(db, data);
   });
 
   res.send(delivery);
