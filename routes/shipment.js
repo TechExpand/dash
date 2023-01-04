@@ -13,8 +13,6 @@ const Profile = require('../models/profile');
 const Earning = require('../models/earning');
 const axios = require("axios")
 
-
-
 const { initializeApp } = require('firebase/app');
 const { getFirestore, collection, getDocs, setDoc, doc, getDoc, deleteDoc, query, where, updateDoc } = require('firebase/firestore');
 const Token = require('../models/token');
@@ -39,6 +37,10 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
+
+  // create and connect redis client to local instance.
+
 
 // const messaging = getMessaging(app);
 
@@ -224,7 +226,7 @@ const sendNotification = (located_driver, title, body) => {
         }
         )
         .then(function (response) {
-          console.log(response);
+          // console.log(response);
           // res.send(response)
         })
         .catch(function (error) {
@@ -280,8 +282,6 @@ router.post("/shipment-price", async (req, res, next) => {
       res.send({price:price, distance: distanceMiles})
     }
      
-     
-   
 	} catch (err) {
 		res.status(500).json({ message: err });
 	}
@@ -304,7 +304,7 @@ router.post("/shipment", async (req, res, next) => {
 
   const locations = await Location.find({});
 
-  console.log(locations)
+  // console.log(locations)
   console.log("done")
   locations.forEach(function (location) {
     const distance_in_meter = calcCrow(Number(location.lan), Number(location.long), Number(req.body.lan), Number(req.body.long)).toFixed(1);
@@ -393,7 +393,7 @@ router.put("/shipment-accepted", async (request, response, next) => {
                   mode: docs.mode,
                   status: docs.status
                 }
-                console.log(profile)
+                // console.log(profile)
                 if (err) {
                   response.status(400).send({ message: "failed to update" });
                 } else {
@@ -416,7 +416,25 @@ router.put("/shipment-accepted", async (request, response, next) => {
 })
 
 
+router.put("/testing", async (request, response, next) => {
+
+})
+
+const updateTodayEarn = (currentDate, lastUpdateDate)=>{
+  const date = new Date(currentDate.toString());
+  const date2 = new Date(lastUpdateDate.toString());
+    if (date.toDateString() === date2.toDateString()) {
+      return true;
+    } else {
+      return false;
+    }
+
+}
+
+
+
 router.put("/shipment-started", async (request, response, next) => {
+  
     Delivery.findByIdAndUpdate(
       { _id: mongoose.Types.ObjectId(request.body.id) },
       { status: "started" , reciever: mongoose.Types.ObjectId(request.body.reciever), date: request.body.date  },
@@ -424,9 +442,17 @@ router.put("/shipment-started", async (request, response, next) => {
       async function (err, docsD) {
         Profile.findOne({ _id: mongoose.Types.ObjectId(request.body.profileID) }).then(
           function (profile) {
-            Profile.findByIdAndUpdate(
+            const date = new Date();
+            console.log(date.toString())
+
+            const totalEarnData =  (Number(profile.totalEarn) + Number(request.body.price)).toString() 
+            const commistionPriceData =  (Number(profile.commisionBalance)+((Number(request.body.price)*10)/(100))).toString()
+            const updateTodayEarnValue = updateTodayEarn(date.toString(), profile.lastUpdatedTodayEarn);
+            
+             Profile.findByIdAndUpdate(
               { _id: mongoose.Types.ObjectId(request.body.profileID) },
-              { todayEarn: (Number(profile.todayEarn) + Number(request.body.price)).toString() },
+              { todayEarn: `${updateTodayEarnValue?`${(Number(request.body.price)+ Number(profile.todayEarn))}`:`${Number(request.body.price)}`}`,
+               totalEarn: totalEarnData, commisionBalance:commistionPriceData, lastUpdatedTodayEarn: date.toString()},
               function (err, docs) {
                 if (err) {
                   response.status(400).send({ message: "failed to update" });
@@ -451,7 +477,7 @@ router.put("/shipment-started", async (request, response, next) => {
                     });
                     sendNotification({user:{_id: `${request.body.reciever}`.toString()}}, `Congratulations! Request accepted`, `${docsD.senderName} has accepted your request. you can now message`)
                     const rejectedList = eval(request.body.rejectedusers.toString());
-                    console.log(rejectedList)
+                  
                     rejectedList.forEach(function(e){
                       setNotification(db, {
                         title: `Sorry! Request declined`,

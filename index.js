@@ -9,6 +9,7 @@ const morgan = require('morgan');
 let cookieParser = require('cookie-parser');
 // const formidable = require('express-formidable');
 const multer = require('multer');
+
 const upload = multer();
 const path = require('path');
 
@@ -36,6 +37,8 @@ mongoose.connect(uri, {
     console.log("MongoDB Connected…")
   })
   .catch(err => console.log(err))
+
+
 
 
   app.use('/',  require('./routes/index'));
