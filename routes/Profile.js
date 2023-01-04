@@ -394,7 +394,12 @@ router.put("/token", (req, res, next)=>{
 
 
 
-
+  router.get("/getallearning/:userID", (req, res, next) => {
+    Earning.find({ user: mongoose.Types.ObjectId(req.params.userID)}).then(function (earning){
+      earning.reverse();
+      res.send(earning)
+    })
+  });
 
 
 module.exports = router;
