@@ -398,6 +398,7 @@ router.put("/shipment-accepted", async (request, response, next) => {
                   const shipmentRef = collection(db, 'myshipment');
                   await setDoc(doc(shipmentRef), data);
                   updateOwnerShipment(db, `${request.body.reciever}-${request.body.owner}`)
+                  deletOwnerShipment(db, request.body.owner)
                  
                   response.send({status: "accepted"});         
                 }
