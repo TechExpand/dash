@@ -25,7 +25,7 @@ const Delivery = require('../models/delivery');
 
 
 
-      router.get("/getreviews/:userID", async (req, res, next) => {
+      router.get("/getrate/:userID", async (req, res, next) => {
        Review.aggregate([
         {$match: { user: mongoose.Types.ObjectId(req.params.userID)}},
         {$group: {
@@ -35,16 +35,14 @@ const Delivery = require('../models/delivery');
       ]).then(function(reviews){
         res.send(reviews)
       }) 
-        
+    });
 
-     
 
-        // find({ user: mongoose.Types.ObjectId(req.params.userID)}).then(function (review) {
-        //     res.send({
-        //      reviews: review,
-        //  })
-        // })
-        
+
+      router.get("/getreviews/:userID", async (req, res, next) => {
+        Review.find({ user: mongoose.Types.ObjectId(req.params.userID)}).then(function(reviews){
+         res.send(reviews)
+       }) 
       });
     
 
