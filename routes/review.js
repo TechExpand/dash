@@ -40,7 +40,7 @@ const Delivery = require('../models/delivery');
 
 
       router.get("/getreviews/:userID", async (req, res, next) => {
-        Review.find({ user: mongoose.Types.ObjectId(req.params.userID)}).then(function(reviews){
+        Review.find({ user: mongoose.Types.ObjectId(req.params.userID)}).populate("poster").populate("user").then(function(reviews){
          res.send(reviews)
        }) 
       });
