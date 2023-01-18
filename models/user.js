@@ -22,6 +22,7 @@ const UserSchema = new Schema({
         type: String,
         // required: [true, 'surname field is required']
     },
+    
 	image: String,
 	accountType: {
         type: String,

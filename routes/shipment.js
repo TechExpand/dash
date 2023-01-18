@@ -344,8 +344,6 @@ router.post("/shipment", async (req, res, next) => {
       mode: req.body.mode,
       status: req.body.status
     }
-    
-
      sendNotification(located_driver, `Incoming request`, `${req.body.senderName} is requesting for your service`)
      setShipment(db, data);
   });
@@ -361,7 +359,7 @@ router.put("/shipment-accepted", async (request, response, next) => {
   if (request.body.status == "accepted") {
     Delivery.findByIdAndUpdate(
       { _id: mongoose.Types.ObjectId(request.body.id) },
-      { status: "processing"},
+      { status: "ongoing"},
 
       async function (err, docs) {
 
@@ -436,7 +434,7 @@ router.put("/shipment-started", async (request, response, next) => {
   
     Delivery.findByIdAndUpdate(
       { _id: mongoose.Types.ObjectId(request.body.id) },
-      { status: "started" , reciever: mongoose.Types.ObjectId(request.body.reciever), date: request.body.date  },
+      { status: "ongoing" , reciever: mongoose.Types.ObjectId(request.body.reciever), date: request.body.date  },
 
       async function (err, docsD) {
         Profile.findOne({ _id: mongoose.Types.ObjectId(request.body.profileID) }).then(
