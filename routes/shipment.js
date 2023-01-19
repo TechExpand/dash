@@ -81,6 +81,35 @@ const setShipment =  async (db, data)=> {
 
 
 
+const setPlacedOrder =  async (db, data)=> {
+  const placedOrder = collection(db, 'placedOrder');
+  const placedOrderSnapshot = await setDoc(doc(shipmentRef, `${data.reciever}-${data.owner}`), {
+    state: data.state,
+    shipType: data.shipType,
+    reciever: data.reciever,
+    deliveryID: data.deliveryID,
+    pickup: data.pickup,
+    dropoff: data.dropoff,
+    image: data.image,
+    price: data.price,
+    owner: data.owner,
+    senderName: data.senderName,
+    senderPhone: data.senderPhone,
+    recieverName: data.recieverName,
+    recieverPhone: data.recieverPhone,
+    pickupLan: data.pickupLan,
+    dropoffLan: data.dropoffLan,
+    pickupLog: data.pickupLog,
+    itemName: data.itemName,
+    dropoffLog: data.dropoffLog,
+    mode: data.mode,
+    status: data.status
+  });
+  return placedOrderSnapshot;
+}
+
+
+
 const setNotification =  async  (db, data)=> {
   const notifyRef = collection(db, 'notification');
   const notifySnapshot = await setDoc(doc(notifyRef), {
@@ -92,6 +121,9 @@ const setNotification =  async  (db, data)=> {
   });
   return notifySnapshot;
 }
+
+
+
 
 
 const deleteShipment = async (db, id)=>{
@@ -363,7 +395,6 @@ router.put("/shipment-accepted", async (request, response, next) => {
 
       async function (err, docs) {
 
-
         User.findOne({ _id: mongoose.Types.ObjectId(request.body.reciever) }).then(function (user) {
           Profile.findOne({ user: mongoose.Types.ObjectId(request.body.reciever) }).then(async function (profile) {
                 // res.send({ profile:profile , user: user})
@@ -461,9 +492,32 @@ router.put("/shipment-started", async (request, response, next) => {
                       user: mongoose.Types.ObjectId(request.body.reciever)
                     }
                   ).then(function(vaue){
+                    const data = {
+                      state: docsD.state,
+                      shipType: docsD.shipType,
+                      reciever: docsD.reciever,
+                      price: docsD.price,
+                      owner: docsD.owner,
+                      senderName: docsD.senderName,
+                      senderPhone: docsD.senderPhone,
+                      recieverName: docsD.recieverName,
+                      recieverPhone: docsD.recieverPhone,
+                      pickupLan: docsD.pickupLan,
+                      pickup: docsD.pickup,
+                      image: docsD.image,
+                      dropoff: docsD.dropoff,
+                      dropoffLan: docsD.dropoffLan,
+                      pickupLog: docsD.pickupLog,
+                      itemName: docsD.itemName,
+                      deliveryID:docsD._id.toString(),
+                      dropoffLog: docsD.dropoffLog,
+                      mode: docsD.mode,
+                      status: ""
+                    }
 
                     deletOwnerShipment(db, request.body.owner)
                     deletOwnerMyShipment(db, request.body.owner)
+                    setShipment(db, data);
                   
                     setNotification(db, {
                       title: `Congratulations! Request accepted`,
