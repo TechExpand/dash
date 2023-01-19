@@ -83,7 +83,7 @@ const setShipment =  async (db, data)=> {
 
 const setPlacedOrder =  async (db, data)=> {
   const placedOrder = collection(db, 'placedOrder');
-  const placedOrderSnapshot = await setDoc(doc(shipmentRef, `${data.reciever}-${data.owner}`), {
+  const placedOrderSnapshot = await setDoc(doc(placedOrder, `${data.reciever}-${data.owner}`), {
     state: data.state,
     shipType: data.shipType,
     reciever: data.reciever,
@@ -517,7 +517,7 @@ router.put("/shipment-started", async (request, response, next) => {
 
                     deletOwnerShipment(db, request.body.owner)
                     deletOwnerMyShipment(db, request.body.owner)
-                    setShipment(db, data);
+                    setPlacedOrder(db, data);
                   
                     setNotification(db, {
                       title: `Congratulations! Request accepted`,
