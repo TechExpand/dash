@@ -504,7 +504,7 @@ router.put("/shipment-started", async (request, response, next) => {
                       recieverPhone: docsD.recieverPhone,
                       pickupLan: docsD.pickupLan,
                       pickup: docsD.pickup,
-                      image: docsD.image,
+                      image: "",
                       dropoff: docsD.dropoff,
                       dropoffLan: docsD.dropoffLan,
                       pickupLog: docsD.pickupLog,
