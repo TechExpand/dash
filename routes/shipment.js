@@ -226,7 +226,7 @@ const sendNotification = (located_driver, title, body) => {
       // res.status(200).send({ message: "failed" });
       console.log("failed");
     } else {
-      console.log("working");
+      
       axios.post('https://fcm.googleapis.com/fcm/send',
         JSON.stringify( {
           notification: {
@@ -514,6 +514,11 @@ router.put("/shipment-started", async (request, response, next) => {
                       mode: docsD.mode,
                       status: ""
                     }
+
+
+                    console.log(data)
+
+
 
                     deletOwnerShipment(db, request.body.owner)
                     deletOwnerMyShipment(db, request.body.owner)
