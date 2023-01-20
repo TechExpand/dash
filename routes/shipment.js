@@ -91,6 +91,8 @@ const setPlacedOrder =  async (db, data)=> {
     pickup: data.pickup,
     dropoff: data.dropoff,
     image: data.image,
+    recieveruserinfo: data.recieveruserinfo,
+    recieverprofileinfo: data.recieverprofileinfo,
     price: data.price,
     owner: data.owner,
     senderName: data.senderName,
