@@ -471,9 +471,10 @@ router.put("/shipment-started", async (request, response, next) => {
         Profile.findOne({ _id: mongoose.Types.ObjectId(request.body.profileID) }).then(
           function (profile) {
             const date = new Date();
-            console.log(date.toString())
+            
+            User.findOne({ _id: mongoose.Types.ObjectId(profile.user.toString()) }).then(function(user){
 
-            const totalEarnData =  (Number(profile.totalEarn) + Number(request.body.price)).toString() 
+              const totalEarnData =  (Number(profile.totalEarn) + Number(request.body.price)).toString() 
             const commistionPriceData =  (Number(profile.commisionBalance)+((Number(request.body.price)*10)/(100))).toString()
             const updateTodayEarnValue = updateTodayEarn(date.toString(), profile.lastUpdatedTodayEarn);
             
@@ -481,7 +482,7 @@ router.put("/shipment-started", async (request, response, next) => {
               { _id: mongoose.Types.ObjectId(request.body.profileID) },
               { todayEarn: `${updateTodayEarnValue?`${(Number(request.body.price)+ Number(profile.todayEarn))}`:`${Number(request.body.price)}`}`,
                totalEarn: totalEarnData, commisionBalance:commistionPriceData, lastUpdatedTodayEarn: date.toString()},
-              function (err, docs) {
+              function (err, docsm) {
                 if (err) {
                   response.status(400).send({ message: "failed to update" });
                 } else {
@@ -511,6 +512,8 @@ router.put("/shipment-started", async (request, response, next) => {
                       itemName: docsD.itemName,
                       deliveryID:docsD._id.toString(),
                       dropoffLog: docsD.dropoffLog,
+                      recieveruserinfo: user,
+                      recieverprofileinfo: profile,
                       mode: docsD.mode,
                       status: ""
                     }
@@ -550,6 +553,10 @@ router.put("/shipment-started", async (request, response, next) => {
                 }
               }
             );
+                
+            })
+
+           
           }
         )       
       }
