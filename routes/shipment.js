@@ -568,8 +568,21 @@ router.put("/shipment-complete", async (request, response, next) => {
         if (err) {
           response.status(400).send({ message: "failed to update" });
         } else {
-          response.send(docs);
-          // res.send(docs);
+          // response.send(docs);
+          Profile.findByIdAndUpdate(
+            { _id: mongoose.Types.ObjectId(request.body.profileID) },
+            { completed: `${(Number(request.body.completed))+(Number(1))}` },
+      
+            function (err, docs) {
+              if (err) {
+                response.status(400).send({ message: "failed to update" });
+              } else {
+                response.send(docs);
+                // res.send(docs);
+               
+              }
+            }
+          )
          
         }
       }

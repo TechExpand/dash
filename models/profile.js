@@ -5,6 +5,7 @@ const date = new Date();
 
 const ProfileScema = new Schema({
     shipType: String,
+    completed: { type: String, default: 0},
     todayEarn:{ type: String, default: 0},
     totalEarn:{ type: String,  default: 0},
     commisionBalance: { type: String,  default: 0},
