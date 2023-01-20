@@ -379,6 +379,7 @@ router.put("/token", (req, res, next)=>{
         {
             lan: req.body.lan,
             long: req.body.long,
+            type: req.body.type,
         },
         function(err, docs){
           if (err) {
