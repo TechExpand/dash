@@ -514,8 +514,8 @@ router.put("/shipment-started", async (request, response, next) => {
                       itemName: docsD.itemName,
                       deliveryID:docsD._id.toString(),
                       dropoffLog: docsD.dropoffLog,
-                      recieveruserinfo: user,
-                      recieverprofileinfo: profile,
+                      recieveruserinfo:  JSON.parse(JSON.stringify(user)),
+                      recieverprofileinfo:JSON.parse(JSON.stringify(profile)) ,
                       mode: docsD.mode,
                       status: ""
                     }
