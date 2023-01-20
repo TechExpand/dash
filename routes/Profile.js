@@ -367,6 +367,7 @@ router.put("/token", (req, res, next)=>{
           user: mongoose.Types.ObjectId(req.body.id),
           lan: req.body.lan,
           long: req.body.long,
+          type: req.body.type,
         }
       ).then(function(value){
         res.status(200).send({ message: "created" });

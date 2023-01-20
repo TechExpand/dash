@@ -336,7 +336,7 @@ router.post("/shipment", async (req, res, next) => {
   let located_drivers = []
   let located_drivers_temp = []
 
-  const locations = await Location.find({});
+  const locations = await Location.find({type: "rider"});
 
   // console.log(locations)
   console.log("done")
