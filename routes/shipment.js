@@ -470,11 +470,11 @@ router.put("/shipment-started", async (request, response, next) => {
       { status: "ongoing" , reciever: mongoose.Types.ObjectId(request.body.reciever), date: request.body.date  },
 
       async function (err, docsD) {
-        Profile.findOne({ _id: mongoose.Types.ObjectId(request.body.profileID) }).then(
+        Profile.findOne({ _id: mongoose.Types.ObjectId(request.body.profileID) }).populate("user").then(
           function (profile) {
             const date = new Date();
             
-            User.findOne({ _id: mongoose.Types.ObjectId(profile.user.toString()) }).then(function(user){
+            // User.findOne({ _id: mongoose.Types.ObjectId(profile.user.toString()) }).then(function(user){
 
               const totalEarnData =  (Number(profile.totalEarn) + Number(request.body.price)).toString() 
             const commistionPriceData =  (Number(profile.commisionBalance)+((Number(request.body.price)*10)/(100))).toString()
@@ -514,7 +514,7 @@ router.put("/shipment-started", async (request, response, next) => {
                       itemName: docsD.itemName,
                       deliveryID:docsD._id.toString(),
                       dropoffLog: docsD.dropoffLog,
-                      recieveruserinfo:  JSON.parse(JSON.stringify(user)),
+                      recieveruserinfo:  JSON.parse(JSON.stringify(profile.user)),
                       recieverprofileinfo:JSON.parse(JSON.stringify(profile)) ,
                       mode: docsD.mode,
                       status: ""
@@ -556,7 +556,7 @@ router.put("/shipment-started", async (request, response, next) => {
               }
             );
                 
-            })
+            // })
 
            
           }
