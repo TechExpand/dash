@@ -521,7 +521,7 @@ router.put("/shipment-started", async (request, response, next) => {
                     }
 
 
-                    console.log(data)
+                
 
 
 
@@ -537,18 +537,18 @@ router.put("/shipment-started", async (request, response, next) => {
                       date: request.body.date,
                     });
                     sendNotification({user:{_id: `${request.body.reciever}`.toString()}}, `Congratulations! Request accepted`, `${docsD.senderName} has accepted your request. you can now message`)
-                    const rejectedList = eval(request.body.rejectedusers.toString());
+                    // const rejectedList = eval(request.body.rejectedusers.toString());
                   
-                    rejectedList.forEach(function(e){
-                      setNotification(db, {
-                        title: `Sorry! Request declined`,
-                        body: `${docsD.senderName} has declined your request. goodluck next time`,
-                        deliveryID: request.body.id,
-                        reciever: e.toString(),
-                        date: request.body.date,
-                      });
-                      sendNotification({user:{_id: `${e}`.toString()}}, `Sorry! Request declined`, `${docsD.senderName} has declined your request. goodluck next time`)
-                    })
+                    // rejectedList.forEach(function(e){
+                    //   setNotification(db, {
+                    //     title: `Sorry! Request declined`,
+                    //     body: `${docsD.senderName} has declined your request. goodluck next time`,
+                    //     deliveryID: request.body.id,
+                    //     reciever: e.toString(),
+                    //     date: request.body.date,
+                    //   });
+                    //   sendNotification({user:{_id: `${e}`.toString()}}, `Sorry! Request declined`, `${docsD.senderName} has declined your request. goodluck next time`)
+                    // })
                     response.send({status: "started"});  
                   })
 
