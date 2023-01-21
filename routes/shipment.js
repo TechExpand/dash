@@ -473,9 +473,6 @@ router.put("/shipment-started", async (request, response, next) => {
         Profile.findOne({ _id: mongoose.Types.ObjectId(request.body.profileID) }).populate("user").then(
           function (profile) {
             const date = new Date();
-            
-            // User.findOne({ _id: mongoose.Types.ObjectId(profile.user.toString()) }).then(function(user){
-
               const totalEarnData =  (Number(profile.totalEarn) + Number(request.body.price)).toString() 
             const commistionPriceData =  (Number(profile.commisionBalance)+((Number(request.body.price)*10)/(100))).toString()
             const updateTodayEarnValue = updateTodayEarn(date.toString(), profile.lastUpdatedTodayEarn);
@@ -521,10 +518,6 @@ router.put("/shipment-started", async (request, response, next) => {
                     }
 
 
-                
-
-
-
                     deletOwnerShipment(db, request.body.owner)
                     deletOwnerMyShipment(db, request.body.owner)
                     setPlacedOrder(db, data);
@@ -537,18 +530,7 @@ router.put("/shipment-started", async (request, response, next) => {
                       date: request.body.date,
                     });
                     sendNotification({user:{_id: `${request.body.reciever}`.toString()}}, `Congratulations! Request accepted`, `${docsD.senderName} has accepted your request. you can now message`)
-                    // const rejectedList = eval(request.body.rejectedusers.toString());
-                  
-                    // rejectedList.forEach(function(e){
-                    //   setNotification(db, {
-                    //     title: `Sorry! Request declined`,
-                    //     body: `${docsD.senderName} has declined your request. goodluck next time`,
-                    //     deliveryID: request.body.id,
-                    //     reciever: e.toString(),
-                    //     date: request.body.date,
-                    //   });
-                    //   sendNotification({user:{_id: `${e}`.toString()}}, `Sorry! Request declined`, `${docsD.senderName} has declined your request. goodluck next time`)
-                    // })
+                   
                     response.send({status: "started"});  
                   })
 
