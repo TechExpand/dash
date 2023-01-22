@@ -498,7 +498,7 @@ router.put("/shipment-started", async (request, response, next) => {
                     const data = {
                       state: docsD.state,
                       shipType: docsD.shipType,
-                      reciever: docsD.reciever.toString(),
+                      reciever: request.body.reciever.toString(),
                       price: docsD.price,
                       owner: docsD.owner.toString(),
                       senderName: docsD.senderName,
