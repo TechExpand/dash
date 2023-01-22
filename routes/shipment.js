@@ -469,7 +469,10 @@ router.put("/shipment-started", async (request, response, next) => {
       { _id: mongoose.Types.ObjectId(request.body.id) },
       { status: "ongoing" , reciever: mongoose.Types.ObjectId(request.body.reciever), date: request.body.date  },
 
-      async function (err, docsD) {
+       function (err, docsD) {
+        if (err) {
+          response.status(400).send({ message: err });
+        } else{
         Profile.findOne({ _id: mongoose.Types.ObjectId(request.body.profileID) }).populate("user").then(
           function (profile) {
             const date = new Date();
@@ -483,61 +486,56 @@ router.put("/shipment-started", async (request, response, next) => {
                totalEarn: totalEarnData, commisionBalance:commistionPriceData, lastUpdatedTodayEarn: date.toString()},
               function (err, docsm) {
                 if (err) {
-                  response.status(400).send({ message: "failed to update" });
+                  response.status(400).send({ message: err });
                 } else {
-                 
-
-
-
-                  const data = {
-                    state: docsD.state,
-                    shipType: docsD.shipType,
-                    reciever: docsD.reciever.toString(),
-                    price: docsD.price,
-                    owner: docsD.owner.toString(),
-                    senderName: docsD.senderName,
-                    senderPhone: docsD.senderPhone,
-                    recieverName: docsD.recieverName,
-                    recieverPhone: docsD.recieverPhone,
-                    pickupLan: docsD.pickupLan,
-                    pickup: docsD.pickup,
-                    image: "",
-                    dropoff: docsD.dropoff,
-                    dropoffLan: docsD.dropoffLan,
-                    pickupLog: docsD.pickupLog,
-                    itemName: docsD.itemName,
-                    deliveryID:docsD._id.toString(),
-                    dropoffLog: docsD.dropoffLog,
-                    recieveruserinfo:  JSON.parse(JSON.stringify(profile.user)),
-                    recieverprofileinfo:JSON.parse(JSON.stringify(profile)) ,
-                    mode: docsD.mode,
-                    status: ""
-                  }
-
-
-                  deletOwnerShipment(db, request.body.owner)
-                  deletOwnerMyShipment(db, request.body.owner)
-                  setPlacedOrder(db, data);
-                
-                  setNotification(db, {
-                    title: `Congratulations! Request accepted`,
-                    body: `${docsD.senderName} has accepted your request. you can now message`,
-                    deliveryID: request.body.id,
-                    reciever: request.body.reciever.toString(),
-                    date: request.body.date,
-                  });
-                  // sendNotification({user:{_id: `${request.body.reciever}`.toString()}}, `Congratulations! Request accepted`, `${docsD.senderName} has accepted your request. you can now message`)
-                 
-                 
                   Earning.create(
                     {
                       amount: request.body.price,
                       date: request.body.date,
                       user: mongoose.Types.ObjectId(request.body.reciever)
                     }
-                  )
+                  ).then(function(vaue){
+                    const data = {
+                      state: docsD.state,
+                      shipType: docsD.shipType,
+                      reciever: docsD.reciever.toString(),
+                      price: docsD.price,
+                      owner: docsD.owner.toString(),
+                      senderName: docsD.senderName,
+                      senderPhone: docsD.senderPhone,
+                      recieverName: docsD.recieverName,
+                      recieverPhone: docsD.recieverPhone,
+                      pickupLan: docsD.pickupLan,
+                      pickup: docsD.pickup,
+                      image: "",
+                      dropoff: docsD.dropoff,
+                      dropoffLan: docsD.dropoffLan,
+                      pickupLog: docsD.pickupLog,
+                      itemName: docsD.itemName,
+                      deliveryID:docsD._id.toString(),
+                      dropoffLog: docsD.dropoffLog,
+                      recieveruserinfo:  JSON.parse(JSON.stringify(profile.user)),
+                      recieverprofileinfo:JSON.parse(JSON.stringify(profile)) ,
+                      mode: docsD.mode,
+                      status: ""
+                    }
+
+
+                    deletOwnerShipment(db, request.body.owner)
+                    deletOwnerMyShipment(db, request.body.owner)
+                    setPlacedOrder(db, data);
                   
-                  response.send({status: "started"}); 
+                    setNotification(db, {
+                      title: `Congratulations! Request accepted`,
+                      body: `${docsD.senderName} has accepted your request. you can now message`,
+                      deliveryID: request.body.id,
+                      reciever: request.body.reciever.toString(),
+                      date: request.body.date,
+                    });
+                    sendNotification({user:{_id: `${request.body.reciever}`.toString()}}, `Congratulations! Request accepted`, `${docsD.senderName} has accepted your request. you can now message`)
+                   
+                    response.send({status: "started"});  
+                  })
 
                 }
               }
@@ -547,7 +545,8 @@ router.put("/shipment-started", async (request, response, next) => {
 
            
           }
-        )       
+        ) 
+        }      
       }
     )
   
