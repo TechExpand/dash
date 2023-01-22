@@ -521,22 +521,21 @@ router.put("/shipment-started", async (request, response, next) => {
                     }
 
 
-                    // deletOwnerShipment(db, request.body.owner)
-                    // deletOwnerMyShipment(db, request.body.owner)
-                    // setPlacedOrder(db, data);
+                    deletOwnerShipment(db, request.body.owner)
+                    deletOwnerMyShipment(db, request.body.owner)
+                    setPlacedOrder(db, data);
                   
-                    // setNotification(db, {
-                    //   title: `Congratulations! Request accepted`,
-                    //   body: `${docsD.senderName} has accepted your request. you can now message`,
-                    //   deliveryID: request.body.id,
-                    //   reciever: request.body.reciever.toString(),
-                    //   date: request.body.date,
-                    // });
-                    // sendNotification({user:{_id: `${request.body.reciever}`.toString()}}, `Congratulations! Request accepted`, `${docsD.senderName} has accepted your request. you can now message`)
+                    setNotification(db, {
+                      title: `Congratulations! Request accepted`,
+                      body: `${docsD.senderName} has accepted your request. you can now message`,
+                      deliveryID: request.body.id,
+                      reciever: request.body.reciever.toString(),
+                      date: request.body.date,
+                    });
+                    sendNotification({user:{_id: `${request.body.reciever}`.toString()}}, `Congratulations! Request accepted`, `${docsD.senderName} has accepted your request. you can now message`)
                    
                     response.send({status: "started"});  
                   })
-
 
                   
 
