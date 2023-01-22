@@ -495,43 +495,43 @@ router.put("/shipment-started", async (request, response, next) => {
                       user: mongoose.Types.ObjectId(request.body.reciever)
                     }
                   ).then(function(vaue){
-                    const data = {
-                      state: docsD.state,
-                      shipType: docsD.shipType,
-                      reciever: docsD.reciever.toString(),
-                      price: docsD.price,
-                      owner: docsD.owner.toString(),
-                      senderName: docsD.senderName,
-                      senderPhone: docsD.senderPhone,
-                      recieverName: docsD.recieverName,
-                      recieverPhone: docsD.recieverPhone,
-                      pickupLan: docsD.pickupLan,
-                      pickup: docsD.pickup,
-                      image: "",
-                      dropoff: docsD.dropoff,
-                      dropoffLan: docsD.dropoffLan,
-                      pickupLog: docsD.pickupLog,
-                      itemName: docsD.itemName,
-                      deliveryID:docsD._id.toString(),
-                      dropoffLog: docsD.dropoffLog,
-                      recieveruserinfo:  JSON.parse(JSON.stringify(profile.user)),
-                      recieverprofileinfo:JSON.parse(JSON.stringify(profile)) ,
-                      mode: docsD.mode,
-                      status: ""
-                    }
+                    // const data = {
+                    //   state: docsD.state,
+                    //   shipType: docsD.shipType,
+                    //   reciever: docsD.reciever.toString(),
+                    //   price: docsD.price,
+                    //   owner: docsD.owner.toString(),
+                    //   senderName: docsD.senderName,
+                    //   senderPhone: docsD.senderPhone,
+                    //   recieverName: docsD.recieverName,
+                    //   recieverPhone: docsD.recieverPhone,
+                    //   pickupLan: docsD.pickupLan,
+                    //   pickup: docsD.pickup,
+                    //   image: "",
+                    //   dropoff: docsD.dropoff,
+                    //   dropoffLan: docsD.dropoffLan,
+                    //   pickupLog: docsD.pickupLog,
+                    //   itemName: docsD.itemName,
+                    //   deliveryID:docsD._id.toString(),
+                    //   dropoffLog: docsD.dropoffLog,
+                    //   recieveruserinfo:  JSON.parse(JSON.stringify(profile.user)),
+                    //   recieverprofileinfo:JSON.parse(JSON.stringify(profile)) ,
+                    //   mode: docsD.mode,
+                    //   status: ""
+                    // }
 
 
                     deletOwnerShipment(db, request.body.owner)
                     deletOwnerMyShipment(db, request.body.owner)
                     setPlacedOrder(db, data);
                   
-                    setNotification(db, {
-                      title: `Congratulations! Request accepted`,
-                      body: `${docsD.senderName} has accepted your request. you can now message`,
-                      deliveryID: request.body.id,
-                      reciever: request.body.reciever.toString(),
-                      date: request.body.date,
-                    });
+                    // setNotification(db, {
+                    //   title: `Congratulations! Request accepted`,
+                    //   body: `${docsD.senderName} has accepted your request. you can now message`,
+                    //   deliveryID: request.body.id,
+                    //   reciever: request.body.reciever.toString(),
+                    //   date: request.body.date,
+                    // });
                     sendNotification({user:{_id: `${request.body.reciever}`.toString()}}, `Congratulations! Request accepted`, `${docsD.senderName} has accepted your request. you can now message`)
                    
                     response.send({status: "started"});  
