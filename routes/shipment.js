@@ -317,7 +317,7 @@ router.post("/shipment-price", async (req, res, next) => {
     }
      
 	} catch (err) {
-		res.status(500).json({ message: err });
+		res.status(500).json({ message: "unable to get location price, location not found" });
 	}
 
 
