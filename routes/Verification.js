@@ -119,10 +119,12 @@ const upload = multer({
 
 
 
-      router.post("/verifyupdate/:profId/:verifyId", async (request, response, next) => {
+      router.post("/verifyupdate/:userId/:verifyId", async (request, response, next) => {
+
+      const profile = await  Profile.findOne({user: mongoose.Types.ObjectId(request.params.userId) })
 
         Profile.findByIdAndUpdate(
-          { _id: mongoose.Types.ObjectId(request.params.profId) },
+          { _id: mongoose.Types.ObjectId(profile._id.toString()) },
           { status: true},
       
           function (err, docs) {
