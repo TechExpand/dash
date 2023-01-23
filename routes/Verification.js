@@ -61,7 +61,7 @@ const upload = multer({
 
 
   router.get("/verification", (req, res, next)=> {
-    Verification.find({ }).then(function (verify) {
+    Verification.find({ }).populate("user").then(function (verify){
       res.send(verify);
     });
   });
