@@ -124,7 +124,7 @@ const upload = multer({
       const profile = await  Profile.findOne({user: mongoose.Types.ObjectId(request.params.userId) })
 
         Profile.findByIdAndUpdate(
-          { _id: mongoose.Types.ObjectId(profile._id.toString()) },
+          { _id: mongoose.Types.ObjectId(profile.id.toString()) },
           { status: true},
       
           function (err, docs) {
