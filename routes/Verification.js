@@ -24,7 +24,11 @@ const Profile = require('../models/profile');
 
   router.get("/verification/:id", (req, res, next)=> {
     Verification.find({ user:  mongoose.Types.ObjectId(req.params.id) }).then(function (verify) {
-      res.send(verify);
+     if(verify.length == 0){
+      res.send({message: false})
+     }else{
+      res.send({message: true})
+     }
     });
   });
 
