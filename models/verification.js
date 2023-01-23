@@ -5,8 +5,7 @@ const Schema = mongoose.Schema;
 
 const VerificationScema = new Schema({
     status: String,
-    ninPassport: String,
-    driverPermit: String,
+    doc: [{ type: String }],
     date: String,
     user: { type: Schema.Types.ObjectId, ref: 'user' },
   });

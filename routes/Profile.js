@@ -349,6 +349,8 @@ router.put("/token", (req, res, next)=>{
   })
 
 
+  
+
 
   router.get('/location', (req, res, next)=> {
     Location.findOne({user: mongoose.Types.ObjectId(req.body.id)}).then(function(value){
@@ -395,6 +397,27 @@ router.put("/token", (req, res, next)=>{
 
   })
 
+
+
+
+router.put("/profiledit", (req, res, next)=>{
+  Profile.findByIdAndUpdate(
+    {_id:  mongoose.Types.ObjectId(value._id) },
+    {
+        online: req.body.online,
+    },
+    function(err, docs){
+      if (err) {
+        res.status(400).send({ message:false });
+      }else{
+        res.status(200).send({ message: true });
+      }
+    }
+  )
+})
+
+
+  
 
 
   router.get("/getallearning/:userID", (req, res, next) => {

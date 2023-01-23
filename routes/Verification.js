@@ -36,24 +36,52 @@ const Profile = require('../models/profile');
   });
 
 
-  router.post("/verification" ,  (req, res, next)=>{        
-    req.body.user =  mongoose.Types.ObjectId(req.body.user)
-    req.body.store =  mongoose.Types.ObjectId(req.body.store)
-    Verification.create(req.body)
+  router.post("/verification" ,  upload.array("doc"), async (req, res, next) => {
+    
+    if (req.files) {
+      //     // Read content from the file
+      let uploadedImageurl = []
+      for (var file of request.files) {
+        // upload image here
+        await cloudinary.uploader.upload(file.path.replace(/ /g, "_"))
+          .then((result) => {
+            uploadedImageurl.push(result.url)
+          }).catch((error) => {
+            res.status(500).send({
+              message: "failure",
+              error,
+            });
+          });
+      }
+  
+  
+      req.body.doc = uploadedImageurl;
+     
+      const date = new Date();
+   req.body.user =  mongoose.Types.ObjectId(req.body.user)
+    Verification.create({
+      status: "false",
+      doc: req.body.doc,
+      date: date.toString(),
+      user: req.body.user,
+    })
           .then(function (verification) {
-            Profile.findByIdAndUpdate(
-              {_id: mongoose.Types.ObjectId(req.body.profileID)},
-              {verified: true},
-              function (err, docs) {
-                if (err) {
-                  res.status(400).send({ message: "failed to update" });
-                } else {
-                  res.send(verification);
-                }
-              }
-            );
+            res.send({message: true});
+
+            // Profile.findByIdAndUpdate(
+            //   {_id: mongoose.Types.ObjectId(req.body.profileID)},
+            //   {verified: true},
+            //   function (err, docs) {
+            //     if (err) {
+            //       res.status(400).send({ message: "failed to update" });
+            //     } else {
+            //       res.send(verification);
+            //     }
+            //   }
+            // );
             })
             .catch(next);
+    }
       })
 
 

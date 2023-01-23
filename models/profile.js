@@ -13,6 +13,7 @@ const ProfileScema = new Schema({
     rate: String,
     status: Boolean,
     verified: Boolean,
+    online: { type: Boolean,  default: false},
     user: { type: Schema.Types.ObjectId, ref: 'user' },
   });
   
