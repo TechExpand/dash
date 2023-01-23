@@ -72,7 +72,7 @@ const upload = multer({
     if (req.files) {
       //     // Read content from the file
       let uploadedImageurl = []
-      for (var file of request.files) {
+      for (var file of req.files) {
         // upload image here
         await cloudinary.uploader.upload(file.path.replace(/ /g, "_"))
           .then((result) => {
