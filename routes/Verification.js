@@ -117,6 +117,40 @@ const upload = multer({
 
 
 
+
+
+      router.post("/verifyupdate/:profId/:verifyId", async (request, response, next) => {
+
+        Profile.findByIdAndUpdate(
+          { _id: mongoose.Types.ObjectId(request.params.profId) },
+          { status: true},
+      
+          function (err, docs) {
+            if (err) {
+              response.status(400).send({ message: "failed to update" });
+            } else {
+              // response.send(docs);
+              // res.send(docs);
+              Verification.findByIdAndUpdate(
+                { _id: mongoose.Types.ObjectId(request.params.verifyId) },
+                { status: "true",},
+            
+                function (err, docs) {
+                  if (err) {
+                    response.status(400).send({ message: "failed to update" });
+                  } else {
+                    response.send(docs);
+                    // res.send(docs);
+                  }
+                }
+              )
+            
+            }
+          }
+        )
+      
+      
+      })
       
 
 
