@@ -139,7 +139,7 @@ const upload = multer({
                   if (err) {
                     response.status(400).send({ message: "failed to update" });
                   } else {
-                    response.send(docs);
+                    response.send({message: true});
                     // res.send(docs);
                   }
                 }
