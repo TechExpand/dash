@@ -3,12 +3,39 @@
 const express = require('express');
 const validate = require('../middleware/validate');
 const mongoose = require('mongoose');
-
+const cloudinary = require("cloudinary").v2;
 const router = express.Router();
-
+let multer = require("multer");
+const fs = require("fs");
 const Verification = require('../models/verification');
 const Profile = require('../models/profile');
 
+
+
+
+// cloudinary configuration
+cloudinary.config({
+  cloud_name: 'dqth56myg',
+  api_key: '774921177923962',
+  api_secret: 'dDUKTJBycDHC4gjOKZ9UAHw8SAM'
+});
+
+
+const imageStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, './src/image')
+  },
+  filename: (req, file, cb) => {
+    let filename = Date.now() + "--" + file.originalname;
+    cb(null, filename.replace(/\s+/g, ''))
+  }
+});
+
+
+
+const upload = multer({
+  storage: imageStorage,
+})
 
 
 
