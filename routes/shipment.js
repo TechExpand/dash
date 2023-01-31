@@ -294,15 +294,13 @@ function toRad(Value)
     return Value * Math.PI / 180;
 }
 
-
+// Converts numeric degrees to radians
 router.post("/shipment-price", async (req, res, next) => {
   try {
 		const response = await axios({
 			url: `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${req.body.origins}&destinations=${req.body.destinations}&units=metric&key=AIzaSyAXyfHKsb7l7fzUj_WuZa-vsK-4o8mBRT0`,
 			method: "get",
 		});
-
-
 
     let distance = 0;
 
