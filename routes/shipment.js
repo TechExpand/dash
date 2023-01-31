@@ -298,11 +298,22 @@ function toRad(Value)
 router.post("/shipment-price", async (req, res, next) => {
   try {
 		const response = await axios({
-			url: `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${req.body.origins}&destinations=${req.body.destinations}&key=AIzaSyAXyfHKsb7l7fzUj_WuZa-vsK-4o8mBRT0`,
+			url: `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${req.body.origins}&destinations=${req.body.destinations}&units=metric&key=AIzaSyAXyfHKsb7l7fzUj_WuZa-vsK-4o8mBRT0`,
 			method: "get",
 		});
-    const distance = Number(response.data.rows[0].elements[0].distance.text.toString().slice(response.data.rows[0].elements[0].distance.text.toString(), response.data.rows[0].elements[0].distance.text.toString().length-3))
+
+
+
+    let distance = 0;
+
+    for(var value of response.data.rows[0].elements){
+      distance = distance +  (Number(value.distance.value)/1000)
+      console.log(distance)
+    }
+    
+    
     const distanceMiles =  Number(distance * 0.621)
+
     if(distanceMiles>=15){
       const price = Math.ceil(Number(distanceMiles * 150));
       res.send({price:price, distance: distanceMiles})
