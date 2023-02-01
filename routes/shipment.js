@@ -441,15 +441,15 @@ router.put("/shipment-accepted", async (request, response, next) => {
                   recieveruserinfo: JSON.parse(JSON.stringify(user)) ,
                   price: docs.price,
                   owner: docs.owner.toString(),
-                  senderName: docs.senderName,
-                  senderPhone: docs.senderPhone,
-                  recieverName: docs.recieverName,
-                  recieverPhone: docs.recieverPhone,
-                  pickupLan: docs.pickupLan,
-                  dropoffLan: docs.dropoffLan,
-                  pickupLog: docs.pickupLog,
+                  // senderName: docs.senderName,
+                  // senderPhone: docs.senderPhone,
+                  // recieverName: docs.recieverName,
+                  // recieverPhone: docs.recieverPhone,
+                  // pickupLan: docs.pickupLan,
+                  // dropoffLan: docs.dropoffLan,
+                  // pickupLog: docs.pickupLog,
                   itemName: docs.itemName,
-                  dropoffLog: docs.dropoffLog,
+                  // dropoffLog: docs.dropoffLog,
                   mode: docs.mode,
                   status: docs.status
                 }
@@ -616,6 +616,15 @@ router.put("/shipment-complete", async (request, response, next) => {
       }
     )
 })
+
+
+
+
+router.get("/getdelivery/:deliveryID", async (req, res, next) => {
+  DeliveryInfo.find({ delivery: mongoose.Types.ObjectId(req.params.deliveryID)}).then(function(delivery){
+   res.send(delivery)
+ }) 
+});
 
 
 module.exports = router;
