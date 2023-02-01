@@ -19,6 +19,7 @@ const Token = require('../models/token');
 const Location = require('../models/location');
 const { getMessaging } = require('firebase/messaging');
 const User = require('../models/user');
+const DeliveryInfo = require('../models/deliveryInfo');
 
 // Follow this pattern to import other Firebase services
 // import { } from 'firebase/<service>';
@@ -363,6 +364,26 @@ router.post("/shipment", async (req, res, next) => {
 
   Delivery.create(req.body)
         .then(async function (delivery){
+          let deliveryinfoData  = [];
+          for (let i = 0; i < req.body.senderName.length; i++) {
+
+            deliveryinfoData.push({
+          senderName: req.body.senderName[i],
+          senderPhone: req.body.senderPhone[i],
+          recieverName: req.body.recieverName[i],
+          recieverPhone: req.body.recieverPhone[i],
+          pickupLan: req.body.pickupLan[i],
+          dropoffLan: req.body.dropoffLan[i],
+          pickup: req.body.pickup[i],
+          dropoff: req.body.dropoff[i],
+          pickupLog: req.body.pickupLog[i],
+          dropoffLog: req.body.dropoffLog[i],
+          delivery: mongoose.Types.ObjectId(delivery._id)
+            });
+
+          }
+
+          const deliveryinfo = await DeliveryInfo.insertMany(deliveryinfoData);
             //send notifications to available drivers
    located_drivers.forEach(function (located_driver) {
     const data = {
@@ -371,25 +392,26 @@ router.post("/shipment", async (req, res, next) => {
       reciever: located_driver.user._id.toString(),
       price: req.body.price,
       owner: req.body.owner,
-      senderName: req.body.senderName,
-      senderPhone: req.body.senderPhone,
-      recieverName: req.body.recieverName,
-      recieverPhone: req.body.recieverPhone,
-      pickupLan: req.body.pickupLan,
-      pickup: req.body.pickup,
+      senderName: req.body.senderName[0],
+      senderPhone: req.body.senderPhone[0],
+      recieverName: req.body.recieverName[0],
+      recieverPhone: req.body.recieverPhone[0],
+      pickupLan: req.body.pickupLan[0],
+      pickup: req.body.pickup[0],
       image: req.body.image,
-      dropoff: req.body.dropoff,
-      dropoffLan: req.body.dropoffLan,
-      pickupLog: req.body.pickupLog,
+      dropoff: req.body.dropoff[0],
+      dropoffLan: req.body.dropoffLan[0],
+      pickupLog: req.body.pickupLog[0],
       itemName: req.body.itemName,
       deliveryID: delivery._id.toString(),
-      dropoffLog: req.body.dropoffLog,
+      dropoffLog: req.body.dropoffLog[0],
       mode: req.body.mode,
       status: req.body.status
     }
-     sendNotification(located_driver, `Incoming request`, `${req.body.senderName} is requesting for your service`)
+     sendNotification(located_driver, `Incoming request`, `${req.body.senderName[0]} is requesting for your service`)
      setShipment(db, data);
   });
+   //send notifications to available drivers
 
   res.send(delivery);
         
