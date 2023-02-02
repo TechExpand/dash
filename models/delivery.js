@@ -24,7 +24,9 @@ const DeliveryScema = new Schema({
     },
     status: {
       type: String
-    }
+    },
+
+    deliveryinfo: [{ type:  Schema.Types.ObjectId, default: null , ref: 'deliveryinfo'}]
   });
   
   const Delivery = mongoose.model('delivery', DeliveryScema);

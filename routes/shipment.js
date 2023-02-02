@@ -198,7 +198,7 @@ router.delete("/review/:id", (req, res, next) => {
 
 router.get("/getownershipment/:userID", (req, res, next) => {
   Delivery.find({ owner: mongoose.Types.ObjectId(req.params.userID)}).populate("owner").
-  populate("reciever").then(function (delivery) {
+  populate("reciever").populate("deliveryinfo").then(function (delivery) {
     delivery.reverse();
     res.send(delivery)
   })
@@ -382,8 +382,16 @@ router.post("/shipment", async (req, res, next) => {
             });
 
           }
-
+            let idList = []
           const deliveryinfo = await DeliveryInfo.insertMany(deliveryinfoData);
+          for(var value of deliveryinfo){
+            idList.push(mongoose.Types.ObjectId(value._id.toString()))
+          }
+
+          const updatedDeliveryinfo  = await  Delivery.findOneAndUpdate({_id: mongoose.Types.ObjectId(delivery._id)}, {
+            deliveryinfo: idList,
+          })
+          // console.log(updatedDeliveryinfo)
             //send notifications to available drivers
    located_drivers.forEach(function (located_driver) {
     const data = {
