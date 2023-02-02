@@ -60,20 +60,21 @@ const setShipment =  async (db, data)=> {
     shipType: data.shipType,
     reciever: data.reciever,
     deliveryID: data.deliveryID,
-    pickup: data.pickup,
-    dropoff: data.dropoff,
+    // pickup: data.pickup,
+    // dropoff: data.dropoff,
     image: data.image,
     price: data.price,
     owner: data.owner,
-    senderName: data.senderName,
-    senderPhone: data.senderPhone,
-    recieverName: data.recieverName,
-    recieverPhone: data.recieverPhone,
-    pickupLan: data.pickupLan,
-    dropoffLan: data.dropoffLan,
-    pickupLog: data.pickupLog,
+    deliveryinfo: data.deliveryinfo,
+    // senderName: data.senderName,
+    // senderPhone: data.senderPhone,
+    // recieverName: data.recieverName,
+    // recieverPhone: data.recieverPhone,
+    // pickupLan: data.pickupLan,
+    // dropoffLan: data.dropoffLan,
+    // pickupLog: data.pickupLog,
     itemName: data.itemName,
-    dropoffLog: data.dropoffLog,
+    // dropoffLog: data.dropoffLog,
     mode: data.mode,
     status: data.status
   });
@@ -84,27 +85,29 @@ const setShipment =  async (db, data)=> {
 
 const setPlacedOrder =  async (db, data)=> {
   const placedOrder = collection(db, 'placedOrder');
+  console.log(data.deliveryinfo)
   const placedOrderSnapshot = await setDoc(doc(placedOrder, `${data.reciever}-${data.owner}`), {
     state: data.state,
     shipType: data.shipType,
     reciever: data.reciever,
     deliveryID: data.deliveryID,
-    pickup: data.pickup,
-    dropoff: data.dropoff,
+    // pickup: data.pickup,
+    // dropoff: data.dropoff,
     image: data.image,
     recieveruserinfo: data.recieveruserinfo,
     recieverprofileinfo: data.recieverprofileinfo,
     price: data.price,
     owner: data.owner,
-    senderName: data.senderName,
-    senderPhone: data.senderPhone,
-    recieverName: data.recieverName,
-    recieverPhone: data.recieverPhone,
-    pickupLan: data.pickupLan,
-    dropoffLan: data.dropoffLan,
-    pickupLog: data.pickupLog,
+    // senderName: data.senderName,
+    // senderPhone: data.senderPhone,
+    // recieverName: data.recieverName,
+    // recieverPhone: data.recieverPhone,
+    // pickupLan: data.pickupLan,
+    // dropoffLan: data.dropoffLan,
+    // pickupLog: data.pickupLog,
     itemName: data.itemName,
-    dropoffLog: data.dropoffLog,
+    deliveryinfo: data.deliveryinfo,
+    // dropoffLog: data.dropoffLog,
     mode: data.mode,
     status: data.status
   });
@@ -206,7 +209,9 @@ router.get("/getownershipment/:userID", (req, res, next) => {
 
 
 router.get("/getrecievershipment/:userID", (req, res, next) => {
-  Delivery.find({ reciever: mongoose.Types.ObjectId(req.params.userID)}).populate("owner").populate("reciever").then(function (delivery) {
+  Delivery.find({ reciever: mongoose.Types.ObjectId(req.params.userID)}).populate("owner").populate("reciever")
+  .populate("deliveryinfo")
+  .then(function (delivery) {
     delivery.reverse();
     res.send(delivery)
   })
@@ -365,6 +370,7 @@ router.post("/shipment", async (req, res, next) => {
   Delivery.create(req.body)
         .then(async function (delivery){
           let deliveryinfoData  = [];
+          let deliveryinfoDataFB = [];
           for (let i = 0; i < req.body.senderName.length; i++) {
 
             deliveryinfoData.push({
@@ -380,6 +386,19 @@ router.post("/shipment", async (req, res, next) => {
           dropoffLog: req.body.dropoffLog[i],
           delivery: mongoose.Types.ObjectId(delivery._id)
             });
+
+            deliveryinfoDataFB.push({
+              senderName: req.body.senderName[i],
+              senderPhone: req.body.senderPhone[i],
+              recieverName: req.body.recieverName[i],
+              recieverPhone: req.body.recieverPhone[i],
+              pickupLan: req.body.pickupLan[i],
+              dropoffLan: req.body.dropoffLan[i],
+              pickup: req.body.pickup[i],
+              dropoff: req.body.dropoff[i],
+              pickupLog: req.body.pickupLog[i],
+              dropoffLog: req.body.dropoffLog[i],
+                });
 
           }
             let idList = []
@@ -400,19 +419,20 @@ router.post("/shipment", async (req, res, next) => {
       reciever: located_driver.user._id.toString(),
       price: req.body.price,
       owner: req.body.owner,
-      senderName: req.body.senderName[0],
-      senderPhone: req.body.senderPhone[0],
-      recieverName: req.body.recieverName[0],
-      recieverPhone: req.body.recieverPhone[0],
-      pickupLan: req.body.pickupLan[0],
-      pickup: req.body.pickup[0],
-      image: req.body.image,
-      dropoff: req.body.dropoff[0],
-      dropoffLan: req.body.dropoffLan[0],
-      pickupLog: req.body.pickupLog[0],
+      deliveryinfo: deliveryinfoDataFB,
+      // senderName: req.body.senderName[0],
+      // senderPhone: req.body.senderPhone[0],
+      // recieverName: req.body.recieverName[0],
+      // recieverPhone: req.body.recieverPhone[0],
+      // pickupLan: req.body.pickupLan[0],
+      // pickup: req.body.pickup[0],
+      // dropoff: req.body.dropoff[0],
+      // dropoffLan: req.body.dropoffLan[0],
+      // pickupLog: req.body.pickupLog[0],
+      // dropoffLog: req.body.dropoffLog[0],
       itemName: req.body.itemName,
+      image: req.body.image,
       deliveryID: delivery._id.toString(),
-      dropoffLog: req.body.dropoffLog[0],
       mode: req.body.mode,
       status: req.body.status
     }
@@ -533,26 +553,29 @@ router.put("/shipment-started", async (request, response, next) => {
                       date: request.body.date,
                       user: mongoose.Types.ObjectId(request.body.reciever)
                     }
-                  ).then(function(vaue){
+                  ).then(async function(vaue){
+                    const deliveryinfo = await DeliveryInfo.find({delivery: mongoose.Types.ObjectId(request.body.id)}, { delivery: 0, _id: 0, __v: 0 },);
+                   console.log(deliveryinfo[0].senderName)
                     const data = {
                       state: docsD.state,
                       shipType: docsD.shipType,
                       reciever: request.body.reciever.toString(),
                       price: docsD.price,
                       owner: docsD.owner.toString(),
-                      senderName: docsD.senderName,
-                      senderPhone: docsD.senderPhone,
-                      recieverName: docsD.recieverName,
-                      recieverPhone: docsD.recieverPhone,
-                      pickupLan: docsD.pickupLan,
-                      pickup: docsD.pickup,
+                      deliveryinfo: JSON.parse(JSON.stringify(deliveryinfo)),
+                      // senderName: docsD.senderName,
+                      // senderPhone: docsD.senderPhone,
+                      // recieverName: docsD.recieverName,
+                      // recieverPhone: docsD.recieverPhone,
+                      // pickupLan: docsD.pickupLan,
+                      // pickup: docsD.pickup,
                       image: "",
-                      dropoff: docsD.dropoff,
-                      dropoffLan: docsD.dropoffLan,
-                      pickupLog: docsD.pickupLog,
+                      // dropoff: docsD.dropoff,
+                      // dropoffLan: docsD.dropoffLan,
+                      // pickupLog: docsD.pickupLog,
                       itemName: docsD.itemName,
                       deliveryID:docsD._id.toString(),
-                      dropoffLog: docsD.dropoffLog,
+                      // dropoffLog: docsD.dropoffLog,
                       recieveruserinfo:  JSON.parse(JSON.stringify(profile.user)),
                       recieverprofileinfo:JSON.parse(JSON.stringify(profile)) ,
                       mode: docsD.mode,
@@ -566,12 +589,12 @@ router.put("/shipment-started", async (request, response, next) => {
                   
                     setNotification(db, {
                       title: `Congratulations! Request accepted`,
-                      body: `${docsD.senderName} has accepted your request. you can now message`,
+                      body: `${deliveryinfo[0].senderName} has accepted your request. you can now message`,
                       deliveryID: request.body.id,
                       reciever: request.body.reciever.toString(),
                       date: request.body.date,
                     });
-                    sendNotification({user:{_id: `${request.body.reciever}`.toString()}}, `Congratulations! Request accepted`, `${docsD.senderName} has accepted your request. you can now message`)
+                    sendNotification({user:{_id: `${request.body.reciever}`.toString()}}, `Congratulations! Request accepted`, `${deliveryinfo[0].senderName} has accepted your request. you can now message`)
                    
                     response.send({status: "started"});  
                   })
