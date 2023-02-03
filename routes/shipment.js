@@ -208,6 +208,16 @@ router.get("/getownershipment/:userID", (req, res, next) => {
 });
 
 
+
+router.get("/getallshipment", (req, res, next) => {
+  Delivery.find({ }).populate("owner").
+  populate("reciever").populate("deliveryinfo").then(function (delivery) {
+    delivery.reverse();
+    res.send(delivery)
+  })
+});
+
+
 router.get("/getrecievershipment/:userID", (req, res, next) => {
   Delivery.find({ reciever: mongoose.Types.ObjectId(req.params.userID)}).populate("owner").populate("reciever")
   .populate("deliveryinfo")
