@@ -440,8 +440,7 @@ router.post("/shipment", async (req, res, next) => {
           const updatedDeliveryinfo  = await  Delivery.findOneAndUpdate({_id: mongoose.Types.ObjectId(delivery._id)}, {
             deliveryinfo: idList,
           })
-          // console.log(updatedDeliveryinfo)
-            //send notifications to available drivers
+       
    located_drivers.forEach(function (located_driver) {
     const data = {
       state: req.body.state,
