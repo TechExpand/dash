@@ -347,23 +347,13 @@ router.post("/shipment-price", async (req, res, next) => {
 
 
 router.post("/shipment", async (req, res, next) => {
-     console.log(req.body.senderName)
-     console.log(req.body.senderName.toString().split(' '))
+    //  console.log(req.body.senderName)
+    //  console.log(req.body.senderName.toString().split(' '))
 
-  // req.body.status = "pending";
-  // req.body.senderName =  req.body.senderName.replace(/'/g, '"')
-  // req.body.senderPhone =  req.body.senderPhone.replace(/'/g, '"')
-  // req.body.recieverName =  req.body.recieverName.replace(/'/g, '"')
-  // req.body.recieverPhone =  req.body.recieverPhone.replace(/'/g, '"')
-  // req.body.pickupLan =  req.body.pickupLan.replace(/'/g, '"')
-  // req.body.dropoffLan =  req.body.dropoffLan.replace(/'/g, '"')
-  // req.body.dropoff =  req.body.dropoff.replace(/'/g, '"')
-  // req.body.pickup =  req.body.pickup.replace(/'/g, '"')
-  // req.body.pickupLog =  req.body.pickupLog.replace(/'/g, '"')
-  // req.body.dropoffLog =  req.body.dropoffLog.replace(/'/g, '"')
-
+  console.log(req.body.senderName)
   req.body.status = "pending";
   req.body.senderName =  req.body.senderName.toString().split(' ');
+  console.log(req.body.senderName)
   req.body.senderPhone = req.body.senderPhone.toString().split(' ');
   req.body.recieverName =  req.body.recieverName.toString().split(' ');
   req.body.recieverPhone =  req.body.recieverPhone.toString().split(' ');
