@@ -347,7 +347,7 @@ router.post("/shipment-price", async (req, res, next) => {
 
 
 router.post("/shipment", async (req, res, next) => {
-     console.log(JSON.stringify(req.body))
+     console.log(JSON.stringify(req.body.recieverName[0]))
 
   req.body.status = "pending";
   console.log(req.body.senderName)
