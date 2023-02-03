@@ -347,18 +347,7 @@ router.post("/shipment-price", async (req, res, next) => {
 
 
 router.post("/shipment", async (req, res, next) => {
-console.log({
-  senderName:req.body.senderName,
-  senderPhone: req.body.senderPhone,
-  recieverName: req.body.recieverName,
-  recieverPhone: req.body.recieverPhone,
-  pickupLan:req.body.pickupLan,
-  dropoffLan: req.body.dropoffLan,
-  pickup: req.body.pickup,
-  dropoff:  req.body.dropoff,
-  pickupLog: req.body.pickupLog,
-  dropoffLog: req.body.dropoffLog,
-    })
+     console.log(JSON.stringify(req.body))
 
   req.body.status = "pending";
   console.log(req.body.senderName)
