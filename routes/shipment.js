@@ -362,7 +362,7 @@ router.post("/shipment", async (req, res, next) => {
   // req.body.pickupLog =  req.body.pickupLog.replace(/'/g, '"')
   // req.body.dropoffLog =  req.body.dropoffLog.replace(/'/g, '"')
 
-
+  req.body.status = "pending";
   req.body.senderName =  req.body.senderName.toString().split(' ');
   req.body.senderPhone = req.body.senderPhone.toString().split(' ');
   req.body.recieverName =  req.body.recieverName.toString().split(' ');
