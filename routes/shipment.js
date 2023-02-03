@@ -347,10 +347,10 @@ router.post("/shipment-price", async (req, res, next) => {
 
 
 router.post("/shipment", async (req, res, next) => {
-     console.log(JSON.stringify(req.body.recieverName[0]))
+     console.log(JSON.stringify(req.body.senderName[0]))
+     console.log(JSON.parse(JSON.stringify(req.body.senderName))[0])
 
   req.body.status = "pending";
-  console.log(req.body.senderName)
   req.body.senderName =  req.body.senderName.replace(/'/g, '"')
   req.body.senderPhone =  req.body.senderPhone.replace(/'/g, '"')
   req.body.recieverName =  req.body.recieverName.replace(/'/g, '"')
@@ -361,7 +361,6 @@ router.post("/shipment", async (req, res, next) => {
   req.body.pickup =  req.body.pickup.replace(/'/g, '"')
   req.body.pickupLog =  req.body.pickupLog.replace(/'/g, '"')
   req.body.dropoffLog =  req.body.dropoffLog.replace(/'/g, '"')
-  console.log(req.body.senderName)
 
 
   req.body.senderName =  JSON.parse(req.body.senderName.toString())
