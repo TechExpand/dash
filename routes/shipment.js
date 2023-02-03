@@ -347,10 +347,22 @@ router.post("/shipment-price", async (req, res, next) => {
 
 
 router.post("/shipment", async (req, res, next) => {
-    //  console.log(req.body.senderName)
-    //  console.log(req.body.senderName.toString().split(' '))
+     console.log(req.body.senderName)
+     console.log(req.body.senderName.toString().split(' '))
 
-  console.log(req.body.senderName)
+  // req.body.status = "pending";
+  // req.body.senderName =  req.body.senderName.replace(/'/g, '"')
+  // req.body.senderPhone =  req.body.senderPhone.replace(/'/g, '"')
+  // req.body.recieverName =  req.body.recieverName.replace(/'/g, '"')
+  // req.body.recieverPhone =  req.body.recieverPhone.replace(/'/g, '"')
+  // req.body.pickupLan =  req.body.pickupLan.replace(/'/g, '"')
+  // req.body.dropoffLan =  req.body.dropoffLan.replace(/'/g, '"')
+  // req.body.dropoff =  req.body.dropoff.replace(/'/g, '"')
+  // req.body.pickup =  req.body.pickup.replace(/'/g, '"')
+  // req.body.pickupLog =  req.body.pickupLog.replace(/'/g, '"')
+  // req.body.dropoffLog =  req.body.dropoffLog.replace(/'/g, '"')
+
+  
   req.body.status = "pending";
   req.body.senderName =  req.body.senderName.toString().split(' ');
   console.log(req.body.senderName)
@@ -392,28 +404,28 @@ router.post("/shipment", async (req, res, next) => {
           for (let i = 0; i < req.body.senderName.length; i++) {
 
             deliveryinfoData.push({
-          senderName: req.body.senderName[i],
-          senderPhone: req.body.senderPhone[i],
-          recieverName: req.body.recieverName[i],
-          recieverPhone: req.body.recieverPhone[i],
+          senderName: req.body.senderName[i].toString().replace("-", " "),
+          senderPhone: req.body.senderPhone[i].toString().replace("-", " "),
+          recieverName: req.body.recieverName[i].toString().replace("-", " "),
+          recieverPhone: req.body.recieverPhone[i].toString().replace("-", " "),
           pickupLan: req.body.pickupLan[i],
           dropoffLan: req.body.dropoffLan[i],
-          pickup: req.body.pickup[i],
-          dropoff: req.body.dropoff[i],
+          pickup: req.body.pickup[i].toString().replace("-", " "),
+          dropoff: req.body.dropoff[i].toString().replace("-", " "),
           pickupLog: req.body.pickupLog[i],
           dropoffLog: req.body.dropoffLog[i],
           delivery: mongoose.Types.ObjectId(delivery._id)
             });
 
             deliveryinfoDataFB.push({
-              senderName: req.body.senderName[i],
-              senderPhone: req.body.senderPhone[i],
-              recieverName: req.body.recieverName[i],
-              recieverPhone: req.body.recieverPhone[i],
+              senderName: req.body.senderName[i].toString().replace("-", " "),
+              senderPhone: req.body.senderPhone[i].toString().replace("-", " "),
+              recieverName: req.body.recieverName[i].toString().replace("-", " "),
+              recieverPhone: req.body.recieverPhone[i].toString().replace("-", " "),
               pickupLan: req.body.pickupLan[i],
               dropoffLan: req.body.dropoffLan[i],
-              pickup: req.body.pickup[i],
-              dropoff: req.body.dropoff[i],
+              pickup: req.body.pickup[i].toString().replace("-", " "),
+              dropoff: req.body.dropoff[i].toString().replace("-", " "),
               pickupLog: req.body.pickupLog[i],
               dropoffLog: req.body.dropoffLog[i],
                 });
