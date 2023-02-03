@@ -347,32 +347,31 @@ router.post("/shipment-price", async (req, res, next) => {
 
 
 router.post("/shipment", async (req, res, next) => {
-     console.log(JSON.stringify(req.body.senderName[0]))
-     console.log(JSON.parse(JSON.stringify(req.body.senderName))[0])
+     console.log(req.body.senderName.toString().split(' '))
 
-  req.body.status = "pending";
-  req.body.senderName =  req.body.senderName.replace(/'/g, '"')
-  req.body.senderPhone =  req.body.senderPhone.replace(/'/g, '"')
-  req.body.recieverName =  req.body.recieverName.replace(/'/g, '"')
-  req.body.recieverPhone =  req.body.recieverPhone.replace(/'/g, '"')
-  req.body.pickupLan =  req.body.pickupLan.replace(/'/g, '"')
-  req.body.dropoffLan =  req.body.dropoffLan.replace(/'/g, '"')
-  req.body.dropoff =  req.body.dropoff.replace(/'/g, '"')
-  req.body.pickup =  req.body.pickup.replace(/'/g, '"')
-  req.body.pickupLog =  req.body.pickupLog.replace(/'/g, '"')
-  req.body.dropoffLog =  req.body.dropoffLog.replace(/'/g, '"')
+  // req.body.status = "pending";
+  // req.body.senderName =  req.body.senderName.replace(/'/g, '"')
+  // req.body.senderPhone =  req.body.senderPhone.replace(/'/g, '"')
+  // req.body.recieverName =  req.body.recieverName.replace(/'/g, '"')
+  // req.body.recieverPhone =  req.body.recieverPhone.replace(/'/g, '"')
+  // req.body.pickupLan =  req.body.pickupLan.replace(/'/g, '"')
+  // req.body.dropoffLan =  req.body.dropoffLan.replace(/'/g, '"')
+  // req.body.dropoff =  req.body.dropoff.replace(/'/g, '"')
+  // req.body.pickup =  req.body.pickup.replace(/'/g, '"')
+  // req.body.pickupLog =  req.body.pickupLog.replace(/'/g, '"')
+  // req.body.dropoffLog =  req.body.dropoffLog.replace(/'/g, '"')
 
 
-  req.body.senderName =  JSON.parse(req.body.senderName.toString())
-  req.body.senderPhone =  JSON.parse(req.body.senderPhone.toString())
-  req.body.recieverName =  JSON.parse(req.body.recieverName.toString())
-  req.body.recieverPhone =  JSON.parse(req.body.recieverPhone.toString())
-  req.body.pickupLan =  JSON.parse(req.body.pickupLan.toString())
-  req.body.dropoffLan =  JSON.parse(req.body.dropoffLan.toString())
-  req.body.dropoff =  JSON.parse(req.body.dropoff.toString())
-  req.body.pickup =  JSON.parse(req.body.pickup.toString())
-  req.body.pickupLog =  JSON.parse(req.body.pickupLog.toString())
-  req.body.dropoffLog =  JSON.parse(req.body.dropoffLog.toString())
+  req.body.senderName =  req.body.senderName.toString().split(' ');
+  req.body.senderPhone = req.body.senderPhone.toString().split(' ');
+  req.body.recieverName =  req.body.recieverName.toString().split(' ');
+  req.body.recieverPhone =  req.body.recieverPhone.toString().split(' ');
+  req.body.pickupLan = req.body.pickupLan.toString().split(' ');
+  req.body.dropoffLan =  req.body.dropoffLan.toString().split(' ');
+  req.body.dropoff = req.body.dropoff.toString().split(' ');
+  req.body.pickup =  req.body.pickup.toString().split(' ');
+  req.body.pickupLog =  req.body.pickupLog.toString().split(' ');
+  req.body.dropoffLog =  req.body.dropoffLog.toString().split(' ');
 
 
   let located_drivers = []
