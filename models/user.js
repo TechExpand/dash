@@ -36,6 +36,10 @@ const UserSchema = new Schema({
         type: String,
         required: [true, 'joined field is required']
     },
+    suspended: {
+        type: Boolean,
+        default: null
+    }
 });
 
 

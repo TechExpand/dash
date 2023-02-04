@@ -9,6 +9,7 @@ let multer = require("multer");
 const fs = require("fs");
 const Verification = require('../models/verification');
 const Profile = require('../models/profile');
+const User = require('../models/user');
 
 
 
@@ -150,12 +151,30 @@ const upload = multer({
             }
           }
         )
+      }) 
       })
 
+
+
+
+
+      router.post("/update-user/:userId", async (request, response, next) => {
+          User.findByIdAndUpdate(
+            { _id: mongoose.Types.ObjectId(request.params.userId.toString()) },
+            { suspended: request.body.suspended },
+        
+            function (err, docs) {
+              if (err) {
+                response.status(400).send({ message: "failed to update" });
+              } else {
+                response.send({message: true});
+              
+              }
+            }
+          )
        
-      
-      
-      })
+        })
+        
       
 
 
