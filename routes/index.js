@@ -309,3 +309,12 @@ User.findOne({ phone: phone })
       })
       .catch(next);
   });
+
+
+
+  router.get("/getallusers", (req, res, next) => {
+    User.find({ }).then(function (users) {
+      users.reverse();
+      res.send(users)
+    })
+  });

@@ -209,6 +209,15 @@ router.get("/getownershipment/:userID", (req, res, next) => {
 
 
 
+router.get("/getallearnings", (req, res, next) => {
+  Earning.find({ }).populate("user").then(function (earning) {
+    earning.reverse();
+    res.send(earning)
+  })
+});
+
+
+
 router.get("/getallshipment", (req, res, next) => {
   Delivery.find({ }).populate("owner").
   populate("reciever").populate("deliveryinfo").then(function (delivery) {
