@@ -427,5 +427,15 @@ router.put("/profiledit", (req, res, next)=>{
     })
   });
 
+
+
+
+  router.delete("/delete-account/:id", (req, res, next)=> {
+    User.findByIdAndDelete({ _id:  mongoose.Types.ObjectId(req.params.id) }).then(function (
+        user
+    ) {
+        res.send({user});
+    }).catch(next);;
+  });
 //done
 module.exports = router;
