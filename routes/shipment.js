@@ -323,8 +323,9 @@ function toRad(Value)
 router.post("/shipment-price", async (req, res, next) => {
   try {
 		const response = await axios({
-			url: `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${req.body.origins}&destinations=${req.body.destinations}&units=metric&key=AIzaSyAHCsxZ3KZB7uf8N_umGmfqiOOV-SomJH4`,
-			method: "get",
+			// url: `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${req.body.origins}&destinations=${req.body.destinations}&units=metric&key=AIzaSyAHCsxZ3KZB7uf8N_umGmfqiOOV-SomJH4`,
+			url: `https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${req.body.destinationLan},${req.body.destinationLog}&origins=${req.body.originLan},${req.body.originLog}&key=AIzaSyAHCsxZ3KZB7uf8N_umGmfqiOOV-SomJH4`
+      method: "get",
 		});
 
     let distance = 0;
