@@ -20,6 +20,7 @@ const Location = require('../models/location');
 const { getMessaging } = require('firebase/messaging');
 const User = require('../models/user');
 const DeliveryInfo = require('../models/deliveryInfo');
+const Price = require('../models/price');
 
 // Follow this pattern to import other Firebase services
 // import { } from 'firebase/<service>';
@@ -322,6 +323,7 @@ function toRad(Value)
 // Converts numeric degrees to radians
 router.post("/shipment-price", async (req, res, next) => {
   try {
+    const get_price = await Price.findOne({});
 		const response = await axios({
 			// url: `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${req.body.origins}&destinations=${req.body.destinations}&units=metric&key=AIzaSyAHCsxZ3KZB7uf8N_umGmfqiOOV-SomJH4`,
 			url: `https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${req.body.destinationLan},${req.body.destinationLog}&origins=${req.body.originLan},${req.body.originLog}&key=AIzaSyAHCsxZ3KZB7uf8N_umGmfqiOOV-SomJH4`,
@@ -339,15 +341,15 @@ router.post("/shipment-price", async (req, res, next) => {
     const distanceMiles =  Number(distance * 0.621)
 
     if(distanceMiles>=15){
-      const price = Math.ceil(Number(distanceMiles * 150));
+      const price = Math.ceil(Number(distanceMiles * get_price.maximum));
       res.send({price:price, distance: distanceMiles})
     }
     else if(distanceMiles<=4){
-      const price = Math.ceil(Number(distanceMiles * 450));
+      const price = Math.ceil(Number(distanceMiles * get_price.minimum));
       res.send({price:price, distance: distanceMiles})
     }
     else{
-      const price = Math.ceil(Number(distanceMiles * 200));
+      const price = Math.ceil(Number(distanceMiles * get_price.average));
       res.send({price:price, distance: distanceMiles})
     }
      
