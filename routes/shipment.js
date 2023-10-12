@@ -327,7 +327,7 @@ router.put("/update-price", async (req, res, next) => {
    await  get_price.create({})
    return res.send({message: "created", status: true})
   }else{
-    get_price.update({
+    await get_price.update({
       maximum,
       minimum,
       average
