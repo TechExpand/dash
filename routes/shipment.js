@@ -338,6 +338,13 @@ router.put("/update-price", async (req, res, next) => {
 })
 
 
+
+router.get("/get-price", async (req, res, next) => {
+  const get_price = await Price.findOne({});
+ res.send(get_price)
+})
+
+
 // Converts numeric degrees to radians
 router.post("/shipment-price", async (req, res, next) => {
   try {
