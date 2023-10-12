@@ -324,7 +324,7 @@ router.put("/update-price", async (req, res, next) => {
   const {maximum, minimum, average} = req.body
   const get_price = await Price.findOne({});
   if(!get_price){
-   await  get_price.create({})
+   await  Price.create({})
    return res.send({message: "created", status: true})
   }else{
     await get_price.update({
