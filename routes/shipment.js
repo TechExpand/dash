@@ -320,6 +320,24 @@ function toRad(Value)
     return Value * Math.PI / 180;
 }
 
+router.put("/update-price", async (req, res, next) => {
+  const {maximum, minimum, average} = req.body
+  const get_price = await Price.findOne({});
+  if(!get_price){
+   await  get_price.create({})
+   return res.send({message: "created", status: true})
+  }else{
+    get_price.update({
+      maximum,
+      minimum,
+      average
+    })
+    return res.send({message: "updated", status: true})
+  }
+    
+})
+
+
 // Converts numeric degrees to radians
 router.post("/shipment-price", async (req, res, next) => {
   try {
