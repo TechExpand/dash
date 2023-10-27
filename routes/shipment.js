@@ -364,8 +364,8 @@ router.post("/shipment-price", async (req, res, next) => {
     }
     
     
-    const distanceMiles =  Number(distance * 0.621)
-
+    const distanceMiles =  Number(distance) //in kilometers
+    // Number(distance * 0.621) //convert to miles
     if(distanceMiles>=15){
       const price = Math.ceil(Number(distanceMiles * get_price.maximum));
       res.send({price:price, distance: distanceMiles})
