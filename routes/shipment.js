@@ -370,7 +370,7 @@ router.post("/shipment-price", async (req, res, next) => {
       const price = Math.ceil(Number(distanceMiles * get_price.maximum));
       res.send({price:price, distance: distanceMiles})
     }
-    else if(distanceMiles<=4){
+    else if(distanceMiles<=2){
       const price = Math.ceil(Number(distanceMiles * get_price.minimum));
       res.send({price:price, distance: distanceMiles})
     }
