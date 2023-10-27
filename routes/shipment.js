@@ -364,22 +364,27 @@ router.post("/shipment-price", async (req, res, next) => {
     }
     
     
-    const distanceMiles =  Number(distance) //in kilometers
+    const distanceKm =  Number(distance) //in kilometers
     // Number(distance * 0.621) //convert to miles
-    if(distanceMiles>=15){
-      const price = Math.ceil(Number(distanceMiles * get_price.maximum));
-      res.send({price:price, distance: distanceMiles})
+    if(distanceKm>=15){
+      const price = Math.ceil(Number(distanceKm * get_price.maximum));
+      res.send({price:price, distance: distanceKm})
     }
-    else if(distanceMiles<=2){
-      const price = Math.ceil(Number(distanceMiles * get_price.minimum));
-      res.send({price:price, distance: distanceMiles})
+    else if(distanceKm<=2){
+      if(distanceKm<1){
+        const price = Math.ceil(Number(get_price.minimum));
+        res.send({price:price, distance: distanceKm})
+      }else{
+        const price = Math.ceil(Number(distanceKm * get_price.minimum));
+      res.send({price:price, distance: distanceKm})
+      }
     }
     else{
-      const price = Math.ceil(Number(distanceMiles * get_price.average));
-      res.send({price:price, distance: distanceMiles})
+      const price = Math.ceil(Number(distanceKm * get_price.average));
+      res.send({price:price, distance: distanceKm})
     }
     console.log(`https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${req.body.destinationLan},${req.body.destinationLog}&origins=${req.body.originLan},${req.body.originLog}&key=AIzaSyAHCsxZ3KZB7uf8N_umGmfqiOOV-SomJH4`);
-    console.log(distanceMiles)
+    console.log(distanceKm)
      
 	} catch (err) {
 		res.status(500).json({ message: "unable to get location price, location not found" });
@@ -390,8 +395,8 @@ router.post("/shipment-price", async (req, res, next) => {
   //     Number(req.body.pickuplat), Number(req.body.pickuplon), 
   //   Number(req.body.dropofflat), Number(req.body.dropofflon));
  
-  // const price = Math.ceil(Number(distanceMiles * 1000));
-  // res.send({price:price, distance: distanceMiles})
+  // const price = Math.ceil(Number(distanceKm * 1000));
+  // res.send({price:price, distance: distanceKm})
 })
 
 
