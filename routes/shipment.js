@@ -348,8 +348,7 @@ router.get("/get-price", async (req, res, next) => {
 // Converts numeric degrees to radians
 router.post("/shipment-price", async (req, res, next) => {
   try {
-    console.log(`https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${req.body.destinationLan},${req.body.destinationLog}&origins=${req.body.originLan},${req.body.originLog}&key=AIzaSyAHCsxZ3KZB7uf8N_umGmfqiOOV-SomJH4`);
-    console.log(distanceMiles)
+   
     const get_price = await Price.findOne({});
 		const response = await axios({
 			// url: `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${req.body.origins}&destinations=${req.body.destinations}&units=metric&key=AIzaSyAHCsxZ3KZB7uf8N_umGmfqiOOV-SomJH4`,
@@ -379,6 +378,8 @@ router.post("/shipment-price", async (req, res, next) => {
       const price = Math.ceil(Number(distanceMiles * get_price.average));
       res.send({price:price, distance: distanceMiles})
     }
+    console.log(`https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${req.body.destinationLan},${req.body.destinationLog}&origins=${req.body.originLan},${req.body.originLog}&key=AIzaSyAHCsxZ3KZB7uf8N_umGmfqiOOV-SomJH4`);
+    console.log(distanceMiles)
      
 	} catch (err) {
 		res.status(500).json({ message: "unable to get location price, location not found" });
