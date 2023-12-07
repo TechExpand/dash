@@ -238,7 +238,7 @@ User.findOne({ phone: phone })
           // `https://account.kudisms.net/api/?username=anthony@martlines.ng&password=sirador@101&message=${code} is your Martline access. Do not share this with anyone.&sender=Martline&mobiles=${req.params.phone}`,
           `https://api.ng.termii.com/api/sms/number/send`,
           {
-            "to": `+234${req.params.phone}`,
+            "to": `234${req.params.phone}`,
             // "from": "N-Alert",
             "sms": `${code} is your Dash access. Do not share this with anyone.`,
             // "type": "plain",
