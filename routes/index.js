@@ -236,13 +236,13 @@ User.findOne({ phone: phone })
 
         const response = await axios.post(
           // `https://account.kudisms.net/api/?username=anthony@martlines.ng&password=sirador@101&message=${code} is your Martline access. Do not share this with anyone.&sender=Martline&mobiles=${req.params.phone}`,
-          `https://termii.com/api/sms/send`,
+          `https://api.ng.termii.com/api/sms/number/send`,
           {
             "to": `+234${req.params.phone}`,
-            "from": "N-Alert",
+            // "from": "N-Alert",
             "sms": `${code} is your Dash access. Do not share this with anyone.`,
-            "type": "plain",
-            "channel": "dnd",
+            // "type": "plain",
+            // "channel": "dnd",
             "api_key": "TL2ofq7ayT0gl1h8r1xEXXCGW6C9VYORpdJjRuJ2xBsFxTGO1mEM6qP8FORHPO",
           },
           {
