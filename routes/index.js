@@ -236,7 +236,7 @@ User.findOne({ phone: phone })
 
         const response = await axios.post(
           // `https://account.kudisms.net/api/?username=anthony@martlines.ng&password=sirador@101&message=${code} is your Martline access. Do not share this with anyone.&sender=Martline&mobiles=${req.params.phone}`,
-          `https://api.ng.termii.com/api/sms/number/send`,
+          `https://api.ng.termii.com/api/sms/otp/send`,
           {
             "to": `234${req.params.phone}`,
             // "from": "N-Alert",
