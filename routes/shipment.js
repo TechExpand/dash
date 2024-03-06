@@ -358,19 +358,24 @@ router.post("/shipment-price", async (req, res, next) => {
 
     for (var value of response.data.rows[0].elements) {
       distance = distance + (Number(value.distance.value) / 1000)
-      console.log(distance)
     }
 
 
     const distanceKm = Number(distance) //in kilometers
     // Number(distance * 0.621) //convert to miles
-    if (distanceKm >= 15) {
+    console.log("kkkkkkk")
+    console.log(distanceKm)
+    console.log(distanceKm <= 2)
+    if (distanceKm >= 22) {
       const price = Math.ceil(Number(distanceKm * get_price.maximum));
       res.send({ price: price, distance: distanceKm })
     }
-    else if (distanceKm <= 2) {
-      if (distanceKm < 1) {
+    else if (distanceKm <= 10) {
+      if (distanceKm < 8) {
         const price = Math.ceil(Number(get_price.minimum));
+        console.log("priceeee")
+        console.log(price)
+        console.log(price)
         if (price <= get_price.minimum) {
           res.send({ price: get_price.minimum, distance: distanceKm })
         } else {
@@ -392,7 +397,7 @@ router.post("/shipment-price", async (req, res, next) => {
       const price = Math.ceil(Number(distanceKm * get_price.average));
       res.send({ price: price, distance: distanceKm })
     }
- 
+
 
   } catch (err) {
     res.status(500).json({ message: "unable to get location price, location not found" });
